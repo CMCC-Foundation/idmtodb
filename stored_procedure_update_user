@@ -1,0 +1,24 @@
+use users_idm;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS update_user;
+CREATE PROCEDURE update_user
+( 
+	 IN p_iduser_idm INT,
+	 IN p_username VARCHAR(16),
+     IN p_name VARCHAR(32),
+     IN p_surname VARCHAR(32),
+     IN p_uid INT(11),
+     IN p_gid INT(11),
+     IN p_group_name VARCHAR(32),
+     IN p_division VARCHAR(32),
+     IN p_creation_date DATE,
+     IN p_expiration_date DATE,
+     IN p_vpn_expiration_date DATE,
+     IN p_email VARCHAR(64)
+)  
+   BEGIN  
+	UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, group_name = p_group_name, division = p_division, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email
+    WHERE iduser_idm = p_iduser_idm;
+   END
+   ;;
