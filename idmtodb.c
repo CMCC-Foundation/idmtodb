@@ -918,11 +918,20 @@ int main(int argc, char *argv[])
         
         sprintf(mail_buffer, "%s<br></table><br>%d results UPDATED into the %s DB.</p><br><br><br>", mail_buffer, to_update, database);    
         
+        register unsigned char _to_insert = 0;
+        register unsigned char _to_update = 0;
+        MYSQL_STMT * this_stmt = NULL;
+        
         for(i=0; i<line_num; ++i)
         {
                 pnt_user = &users[i];
-                if(to_insert && pnt_user->iduser_idm == INSERT_CODE) // INSERT_CODE
+                
+                _to_insert = to_insert && pnt_user->iduser_idm == INSERT_CODE;
+                _to_update = to_update && pnt_user->iduser_idm >= 0;
+                
+                if(_to_insert || _to_update)
                 {
+                
                         #ifdef DEBUG_MODE
                         printf("i: %d\n", i);
                         printf("pnt_user->username: %s\n", pnt_user->username);
@@ -1020,124 +1029,29 @@ int main(int argc, char *argv[])
                                 is_null_email = 1;
                                 p_email_length = 0;
                         }
-                        
-                        if((status = mysql_stmt_execute(insert_stmt)))
+                
+                        if(_to_update)
                         {
-                                fprintf(stderr, "Error on insert_stmt mysql_stmt_execute: %d\n", status);
-                                fprintf(stderr, "Error: %s\n", mysql_stmt_error(insert_stmt));
+                                #ifdef DEBUG_MODE
+                                printf("i: %d\n", i);
+                                printf("iduser_idm: %d\n", pnt_user->iduser_idm);
+                                #endif
+                                p_iduser_idm = pnt_user->iduser_idm; // 
+                                this_stmt = update_stmt;
+                        }
+                        else
+                                this_stmt = insert_stmt;
+                    
+                        if((status = mysql_stmt_execute(this_stmt)))
+                        {
+                                fprintf(stderr, "Error on mysql_stmt_execute: %d\n", status);
+                                fprintf(stderr, "Error: %s\n", mysql_stmt_error(this_stmt));
                                 exit(1);
-                        }
-                }
-                else if(to_update && pnt_user->iduser_idm >= 0) // UPDATE_CODE
-                {
-                        #ifdef DEBUG_MODE
-                        printf("i: %d\n", i);
-                        printf("iduser_idm: %d\n", pnt_user->iduser_idm);
-                        #endif
-                        p_iduser_idm = pnt_user->iduser_idm; // 
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->username: %s\n", pnt_user->username);
-                        #endif
-                        strcpy(p_username, pnt_user->username);
-                        p_username_length = strlen(p_username);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->name: %s\n", pnt_user->name);
-                        #endif
-                        strcpy(p_name, pnt_user->name);
-                        p_name_length = strlen(p_name);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->name: %s\n", pnt_user->name);
-                        #endif
-                        strcpy(p_surname, pnt_user->surname);
-                        p_surname_length = strlen(p_surname);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->uid: %d\n", pnt_user->uid);
-                        #endif
-                        p_uid = pnt_user->uid;
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->gid: %d\n", pnt_user->gid);
-                        #endif
-                        p_gid = pnt_user->gid;
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->group_name: %s\n", pnt_user->group_name);
-                        #endif
-                        strcpy(p_group_name, pnt_user->group_name);
-                        p_group_name_length = strlen(p_group_name);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->division: %s\n", pnt_user->division);
-                        #endif
-                        strcpy(p_division, pnt_user->division);
-                        p_division_length = strlen(p_division);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
-                        #endif
-                        strcpy(p_creation_date, pnt_user->creation_date);
-                        p_creation_date_length = strlen(p_creation_date);
-                        
-                        if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
-                        {
-                                is_null_expiration_date = 0;
-                                #ifdef DEBUG_MODE
-                                printf("exp not null\n");
-                                printf("pnt_user->expiration_date: %s\n", pnt_user->expiration_date);
-                                #endif
-                                strcpy(p_expiration_date, pnt_user->expiration_date);
-                                p_expiration_date_length = strlen(p_expiration_date);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("exp null\n");
-                                #endif
-                                is_null_expiration_date = 1;
-                                p_expiration_date_length = 0;
-                        }
-                        
-                        if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
-                        {
-                                is_null_vpn_expiration_date = 0;
-                                #ifdef DEBUG_MODE
-                                printf("vpn_exp not null\n");
-                                printf("pnt_user->vpn_expiration_date: %s\n", pnt_user->vpn_expiration_date);
-                                #endif
-                                strcpy(p_vpn_expiration_date, pnt_user->vpn_expiration_date);
-                                p_vpn_expiration_date_length = strlen(p_vpn_expiration_date);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("vpn_exp null\n");
-                                #endif
-                                is_null_vpn_expiration_date = 1;
-                                p_vpn_expiration_date_length = 0;
-                        }
-                        
-                        if(strcmp(pnt_user->email, NULL_IDENTIFIER))
-                        {
-                                is_null_email = 0;
-                                #ifdef DEBUG_MODE
-                                printf("mail not null\n");
-                                printf("pnt_user->email: %s\n", pnt_user->email);
-                                #endif
-                                strcpy(p_email, pnt_user->email);
-                                p_email_length = strlen(p_email);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("mail null\n");
-                                #endif
-                                is_null_email = 1;
-                                p_email_length = 0;
                         }
                 
-                        if((status = mysql_stmt_execute(update_stmt)))
-                        {
-                                fprintf(stderr, "Error on update_stmt mysql_stmt_execute\n");
-                                exit(1);
-                        }
-                        
                 }
+                
+                
         }
            
         mysql_stmt_close(insert_stmt);
