@@ -324,200 +324,175 @@ int main(int argc, char *argv[])
         unsigned long ul_zero_value = 0;
         
         // iduser_idm
-        int p_up_iduser_idm = 0;
+        int p_iduser_idm = 0;
         ps_update_user_params[P_INOUT_IDUSER_IDM].buffer_type = MYSQL_TYPE_LONG;
-        ps_update_user_params[P_INOUT_IDUSER_IDM].buffer = (int *) &p_up_iduser_idm;
+        ps_update_user_params[P_INOUT_IDUSER_IDM].buffer = (int *) &p_iduser_idm;
         ps_update_user_params[P_INOUT_IDUSER_IDM].length = &ul_zero_value;
         ps_update_user_params[P_INOUT_IDUSER_IDM].is_null = 0;
         
         
         // username
-        unsigned long p_in_username_length = 0;
-        unsigned long p_up_username_length = 0;
-        // unsigned long p_out_username_length = 0;
-        char p_in_username[MAX_USERNAME_LEN];
-        char p_up_username[MAX_USERNAME_LEN]; 
-        // char p_out_username[MAX_USERNAME_LEN]; 
+        unsigned long p_username_length = 0;
+        char p_username[MAX_USERNAME_LEN];
         ps_insert_user_params[P_IN_USERNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_USERNAME].buffer = (char *) p_in_username; 
+        ps_insert_user_params[P_IN_USERNAME].buffer = (char *) p_username; 
         ps_insert_user_params[P_IN_USERNAME].buffer_length = MAX_USERNAME_LEN;
         ps_insert_user_params[P_IN_USERNAME].is_null = 0;
-        ps_insert_user_params[P_IN_USERNAME].length = &p_in_username_length;
+        ps_insert_user_params[P_IN_USERNAME].length = &p_username_length;
         
         ps_update_user_params[P_INOUT_USERNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_USERNAME].buffer = (char *) p_up_username; 
+        ps_update_user_params[P_INOUT_USERNAME].buffer = (char *) p_username; 
         ps_update_user_params[P_INOUT_USERNAME].buffer_length = MAX_USERNAME_LEN;
         ps_update_user_params[P_INOUT_USERNAME].is_null = 0;
-        ps_update_user_params[P_INOUT_USERNAME].length = &p_up_username_length;
+        ps_update_user_params[P_INOUT_USERNAME].length = &p_username_length;
         
         
         // name
-        unsigned long p_in_name_length = 0;
-        unsigned long p_up_name_length = 0;
-        char p_in_name[MAX_NAME_LEN];
-        char p_up_name[MAX_NAME_LEN];
+        unsigned long p_name_length = 0;
+        char p_name[MAX_NAME_LEN];
         ps_insert_user_params[P_IN_NAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_NAME].buffer = (char *) p_in_name; 
+        ps_insert_user_params[P_IN_NAME].buffer = (char *) p_name; 
         ps_insert_user_params[P_IN_NAME].buffer_length = MAX_NAME_LEN;
         ps_insert_user_params[P_IN_NAME].is_null = 0;
-        ps_insert_user_params[P_IN_NAME].length = &p_in_name_length;
+        ps_insert_user_params[P_IN_NAME].length = &p_name_length;
         
         ps_update_user_params[P_INOUT_NAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_NAME].buffer = (char *) p_up_name; 
+        ps_update_user_params[P_INOUT_NAME].buffer = (char *) p_name; 
         ps_update_user_params[P_INOUT_NAME].buffer_length = MAX_NAME_LEN;
         ps_update_user_params[P_INOUT_NAME].is_null = 0;
-        ps_update_user_params[P_INOUT_NAME].length = &p_up_name_length;
+        ps_update_user_params[P_INOUT_NAME].length = &p_name_length;
         
         // surname
-        unsigned long p_in_surname_length = 0;
-        unsigned long p_up_surname_length = 0;
-        char p_in_surname[MAX_SURNAME_LEN];
-        char p_up_surname[MAX_SURNAME_LEN];
+        unsigned long p_surname_length = 0;
+        char p_surname[MAX_SURNAME_LEN];
         ps_insert_user_params[P_IN_SURNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_SURNAME].buffer = (char *) p_in_surname; 
+        ps_insert_user_params[P_IN_SURNAME].buffer = (char *) p_surname; 
         ps_insert_user_params[P_IN_SURNAME].buffer_length = MAX_SURNAME_LEN;
         ps_insert_user_params[P_IN_SURNAME].is_null = 0;
-        ps_insert_user_params[P_IN_SURNAME].length = &p_in_surname_length;
+        ps_insert_user_params[P_IN_SURNAME].length = &p_surname_length;
         
         ps_update_user_params[P_INOUT_SURNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_SURNAME].buffer = (char *) p_up_surname; 
+        ps_update_user_params[P_INOUT_SURNAME].buffer = (char *) p_surname; 
         ps_update_user_params[P_INOUT_SURNAME].buffer_length = MAX_SURNAME_LEN;
         ps_update_user_params[P_INOUT_SURNAME].is_null = 0;
-        ps_update_user_params[P_INOUT_SURNAME].length = &p_up_surname_length;
+        ps_update_user_params[P_INOUT_SURNAME].length = &p_surname_length;
         
         // uid
-        int p_in_uid = 0;
-        int p_up_uid = 0;
+        int p_uid = 0;
         ps_insert_user_params[P_IN_UID].buffer_type = MYSQL_TYPE_LONG;
-        ps_insert_user_params[P_IN_UID].buffer = (int *) &p_in_uid;
+        ps_insert_user_params[P_IN_UID].buffer = (int *) &p_uid;
         ps_insert_user_params[P_IN_UID].length = &ul_zero_value;
         ps_insert_user_params[P_IN_UID].is_null = 0;
         
         ps_update_user_params[P_INOUT_UID].buffer_type = MYSQL_TYPE_LONG;
-        ps_update_user_params[P_INOUT_UID].buffer = (int *) &p_up_uid;
+        ps_update_user_params[P_INOUT_UID].buffer = (int *) &p_uid;
         ps_update_user_params[P_INOUT_UID].length = &ul_zero_value;
         ps_update_user_params[P_INOUT_UID].is_null = 0;
         
         // gid
-        int p_in_gid = 0;
-        int p_up_gid = 0;
+        int p_gid = 0;
         ps_insert_user_params[P_IN_GID].buffer_type = MYSQL_TYPE_LONG;
-        ps_insert_user_params[P_IN_GID].buffer = (int *) &p_in_gid;
+        ps_insert_user_params[P_IN_GID].buffer = (int *) &p_gid;
         ps_insert_user_params[P_IN_GID].length = &ul_zero_value;
         ps_insert_user_params[P_IN_GID].is_null = 0;
         
         ps_update_user_params[P_INOUT_GID].buffer_type = MYSQL_TYPE_LONG;
-        ps_update_user_params[P_INOUT_GID].buffer = (int *) &p_up_gid;
+        ps_update_user_params[P_INOUT_GID].buffer = (int *) &p_gid;
         ps_update_user_params[P_INOUT_GID].length = &ul_zero_value;
         ps_update_user_params[P_INOUT_GID].is_null = 0;
         
         // group_name
-        unsigned long p_in_group_name_length = 0;
-        unsigned long p_up_group_name_length = 0;
-        char p_in_group_name[MAX_GROUP_NAME_LEN];
-        char p_up_group_name[MAX_GROUP_NAME_LEN];
+        unsigned long p_group_name_length = 0;
+        char p_group_name[MAX_GROUP_NAME_LEN];
         ps_insert_user_params[P_IN_GROUPNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_GROUPNAME].buffer = (char *) p_in_group_name; 
+        ps_insert_user_params[P_IN_GROUPNAME].buffer = (char *) p_group_name; 
         ps_insert_user_params[P_IN_GROUPNAME].buffer_length = MAX_GROUP_NAME_LEN;
         ps_insert_user_params[P_IN_GROUPNAME].is_null = 0;
-        ps_insert_user_params[P_IN_GROUPNAME].length = &p_in_group_name_length;
+        ps_insert_user_params[P_IN_GROUPNAME].length = &p_group_name_length;
         
         ps_update_user_params[P_INOUT_GROUPNAME].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_GROUPNAME].buffer = (char *) p_up_group_name; 
+        ps_update_user_params[P_INOUT_GROUPNAME].buffer = (char *) p_group_name; 
         ps_update_user_params[P_INOUT_GROUPNAME].buffer_length = MAX_GROUP_NAME_LEN;
         ps_update_user_params[P_INOUT_GROUPNAME].is_null = 0;
-        ps_update_user_params[P_INOUT_GROUPNAME].length = &p_up_group_name_length;
+        ps_update_user_params[P_INOUT_GROUPNAME].length = &p_group_name_length;
         
         // division
-        unsigned long p_in_division_length = 0;
-        unsigned long p_up_division_length = 0;
-        char p_in_division[MAX_DIVISION_LEN];
-        char p_up_division[MAX_DIVISION_LEN];
+        unsigned long p_division_length = 0;
+        char p_division[MAX_DIVISION_LEN];
         ps_insert_user_params[P_IN_DIVISION].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_DIVISION].buffer = (char *) p_in_division; 
+        ps_insert_user_params[P_IN_DIVISION].buffer = (char *) p_division; 
         ps_insert_user_params[P_IN_DIVISION].buffer_length = MAX_DIVISION_LEN;
         ps_insert_user_params[P_IN_DIVISION].is_null = 0;
-        ps_insert_user_params[P_IN_DIVISION].length = &p_in_division_length;
+        ps_insert_user_params[P_IN_DIVISION].length = &p_division_length;
         
         ps_update_user_params[P_INOUT_DIVISION].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_DIVISION].buffer = (char *) p_up_division; 
+        ps_update_user_params[P_INOUT_DIVISION].buffer = (char *) p_division; 
         ps_update_user_params[P_INOUT_DIVISION].buffer_length = MAX_DIVISION_LEN;
         ps_update_user_params[P_INOUT_DIVISION].is_null = 0;
-        ps_update_user_params[P_INOUT_DIVISION].length = &p_up_division_length;
+        ps_update_user_params[P_INOUT_DIVISION].length = &p_division_length;
         
         // creation_date
-        unsigned long p_in_creation_date_length = 0;
-        unsigned long p_up_creation_date_length = 0;
-        char p_in_creation_date[MAX_DATE_LEN];
-        char p_up_creation_date[MAX_DATE_LEN];
+        unsigned long p_creation_date_length = 0;
+        char p_creation_date[MAX_DATE_LEN];
         ps_insert_user_params[P_IN_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_insert_user_params[P_IN_CREATION_DATE].buffer = (char *) p_in_creation_date;
+        ps_insert_user_params[P_IN_CREATION_DATE].buffer = (char *) p_creation_date;
         ps_insert_user_params[P_IN_CREATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_insert_user_params[P_IN_CREATION_DATE].length = &p_in_creation_date_length;
+        ps_insert_user_params[P_IN_CREATION_DATE].length = &p_creation_date_length;
         ps_insert_user_params[P_IN_CREATION_DATE].is_null = 0;
         
         ps_update_user_params[P_INOUT_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_update_user_params[P_INOUT_CREATION_DATE].buffer = (char *) p_up_creation_date;
+        ps_update_user_params[P_INOUT_CREATION_DATE].buffer = (char *) p_creation_date;
         ps_update_user_params[P_INOUT_CREATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_update_user_params[P_INOUT_CREATION_DATE].length = &p_up_creation_date_length;
+        ps_update_user_params[P_INOUT_CREATION_DATE].length = &p_creation_date_length;
         ps_update_user_params[P_INOUT_CREATION_DATE].is_null = 0;
 
         // expiration_date
-        my_bool is_null_in_expiration_date;
-        my_bool is_null_up_expiration_date;
-        unsigned long p_in_expiration_date_length = 0;
-        unsigned long p_up_expiration_date_length = 0;
-        char p_in_expiration_date[MAX_DATE_LEN];
-        char p_up_expiration_date[MAX_DATE_LEN];
+        my_bool is_null_expiration_date;
+        unsigned long p_expiration_date_length = 0;
+        char p_expiration_date[MAX_DATE_LEN];
         ps_insert_user_params[P_IN_EXPIRATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_insert_user_params[P_IN_EXPIRATION_DATE].buffer = (char *) p_in_expiration_date;
+        ps_insert_user_params[P_IN_EXPIRATION_DATE].buffer = (char *) p_expiration_date;
         ps_insert_user_params[P_IN_EXPIRATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_insert_user_params[P_IN_EXPIRATION_DATE].length = &p_in_expiration_date_length;
-        ps_insert_user_params[P_IN_EXPIRATION_DATE].is_null = &is_null_in_expiration_date;
+        ps_insert_user_params[P_IN_EXPIRATION_DATE].length = &p_expiration_date_length;
+        ps_insert_user_params[P_IN_EXPIRATION_DATE].is_null = &is_null_expiration_date;
         
         ps_update_user_params[P_INOUT_EXPIRATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_update_user_params[P_INOUT_EXPIRATION_DATE].buffer = (char *) p_up_expiration_date;
+        ps_update_user_params[P_INOUT_EXPIRATION_DATE].buffer = (char *) p_expiration_date;
         ps_update_user_params[P_INOUT_EXPIRATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_update_user_params[P_INOUT_EXPIRATION_DATE].length = &p_up_expiration_date_length;
-        ps_update_user_params[P_INOUT_EXPIRATION_DATE].is_null = &is_null_up_expiration_date;
+        ps_update_user_params[P_INOUT_EXPIRATION_DATE].length = &p_expiration_date_length;
+        ps_update_user_params[P_INOUT_EXPIRATION_DATE].is_null = &is_null_expiration_date;
         
         // vpn_expiration_date
-        my_bool is_null_in_vpn_expiration_date;
-        my_bool is_null_up_vpn_expiration_date;
-        unsigned long p_in_vpn_expiration_date_length = 0;
-        unsigned long p_up_vpn_expiration_date_length = 0;
-        char p_in_vpn_expiration_date[MAX_DATE_LEN];
-        char p_up_vpn_expiration_date[MAX_DATE_LEN];
+        my_bool is_null_vpn_expiration_date;
+        unsigned long p_vpn_expiration_date_length = 0;
+        char p_vpn_expiration_date[MAX_DATE_LEN];
         ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].buffer = (char *) p_in_vpn_expiration_date;
+        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].buffer = (char *) p_vpn_expiration_date;
         ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].length = &p_in_vpn_expiration_date_length;
-        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].is_null = &is_null_in_vpn_expiration_date;
+        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].length = &p_vpn_expiration_date_length;
+        ps_insert_user_params[P_IN_VPN_EXPIRATION_DATE].is_null = &is_null_vpn_expiration_date;
         
         ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].buffer_type = MYSQL_TYPE_STRING;
-        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].buffer = (char *) p_up_vpn_expiration_date;
+        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].buffer = (char *) p_vpn_expiration_date;
         ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].buffer_length = MAX_DATE_LEN;
-        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].length = &p_up_vpn_expiration_date_length;
-        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].is_null = &is_null_up_vpn_expiration_date;
+        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].length = &p_vpn_expiration_date_length;
+        ps_update_user_params[P_INOUT_VPN_EXPIRATION_DATE].is_null = &is_null_vpn_expiration_date;
         
         // email
-        my_bool is_null_in_email;
-        my_bool is_null_up_email;
-        unsigned long p_in_email_length = 0;
-        unsigned long p_up_email_length = 0;
-        char p_in_email[MAX_DIVISION_LEN];
-        char p_up_email[MAX_DIVISION_LEN];
+        my_bool is_null_email;
+        unsigned long p_email_length = 0;
+        char p_email[MAX_DIVISION_LEN];
         ps_insert_user_params[P_IN_EMAIL].buffer_type = MYSQL_TYPE_STRING; 
-        ps_insert_user_params[P_IN_EMAIL].buffer = (char *) p_in_email; 
+        ps_insert_user_params[P_IN_EMAIL].buffer = (char *) p_email; 
         ps_insert_user_params[P_IN_EMAIL].buffer_length = MAX_EMAIL_LEN;
-        ps_insert_user_params[P_IN_EMAIL].is_null = &is_null_in_email;
-        ps_insert_user_params[P_IN_EMAIL].length = &p_in_email_length;
+        ps_insert_user_params[P_IN_EMAIL].is_null = &is_null_email;
+        ps_insert_user_params[P_IN_EMAIL].length = &p_email_length;
         
         ps_update_user_params[P_INOUT_EMAIL].buffer_type = MYSQL_TYPE_STRING; 
-        ps_update_user_params[P_INOUT_EMAIL].buffer = (char *) p_up_email; 
+        ps_update_user_params[P_INOUT_EMAIL].buffer = (char *) p_email; 
         ps_update_user_params[P_INOUT_EMAIL].buffer_length = MAX_EMAIL_LEN;
-        ps_update_user_params[P_INOUT_EMAIL].is_null = &is_null_up_email;
-        ps_update_user_params[P_INOUT_EMAIL].length = &p_up_email_length;
+        ps_update_user_params[P_INOUT_EMAIL].is_null = &is_null_email;
+        ps_update_user_params[P_INOUT_EMAIL].length = &p_email_length;
         
         #ifdef DEBUG_MODE
         printf("\nbefore mysql_stmt_bind_param.\n");
@@ -680,21 +655,21 @@ int main(int argc, char *argv[])
                 pnt_user = &users_db[rows]; // &(users_db[rows].idm_user);
                 
                 #ifdef DEBUG_MODE
-                printf("PRE %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s\n", p_up_iduser_idm, p_up_username, p_up_name, p_up_surname, p_up_uid, p_up_gid, p_up_group_name, p_up_division, p_up_creation_date, is_null_up_expiration_date ? NULL_IDENTIFIER : p_up_expiration_date, is_null_up_vpn_expiration_date ? NULL_IDENTIFIER : p_up_vpn_expiration_date, is_null_up_email ? NULL_IDENTIFIER : p_up_email);
+                printf("PRE %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s\n", p_iduser_idm, p_username, p_name, p_surname, p_uid, p_gid, p_group_name, p_division, p_creation_date, is_null_expiration_date ? NULL_IDENTIFIER : p_expiration_date, is_null_vpn_expiration_date ? NULL_IDENTIFIER : p_vpn_expiration_date, is_null_email ? NULL_IDENTIFIER : p_email);
                 #endif
                
-                pnt_user->iduser_idm = p_up_iduser_idm; // users_db[rows].iduser_idm = p_up_iduser_idm; // pnt_user->iduser_idm = p_up_iduser_idm;
-                strcpy(pnt_user->username, p_up_username);
-                strcpy(pnt_user->name, p_up_name);
-                strcpy(pnt_user->surname, p_up_surname);
-                pnt_user->uid = p_up_uid;
-                pnt_user->gid = p_up_gid;
-                strcpy(pnt_user->group_name, p_up_group_name);
-                strcpy(pnt_user->division, p_up_division);
-                strcpy(pnt_user->creation_date, p_up_creation_date);
-                strcpy(pnt_user->expiration_date, is_null_up_expiration_date ? NULL_IDENTIFIER : p_up_expiration_date);
-                strcpy(pnt_user->vpn_expiration_date, is_null_up_vpn_expiration_date ? NULL_IDENTIFIER : p_up_vpn_expiration_date);
-                strcpy(pnt_user->email, is_null_up_email ? NULL_IDENTIFIER : p_up_email);
+                pnt_user->iduser_idm = p_iduser_idm; // users_db[rows].iduser_idm = p_iduser_idm; // pnt_user->iduser_idm = p_iduser_idm;
+                strcpy(pnt_user->username, p_username);
+                strcpy(pnt_user->name, p_name);
+                strcpy(pnt_user->surname, p_surname);
+                pnt_user->uid = p_uid;
+                pnt_user->gid = p_gid;
+                strcpy(pnt_user->group_name, p_group_name);
+                strcpy(pnt_user->division, p_division);
+                strcpy(pnt_user->creation_date, p_creation_date);
+                strcpy(pnt_user->expiration_date, is_null_expiration_date ? NULL_IDENTIFIER : p_expiration_date);
+                strcpy(pnt_user->vpn_expiration_date, is_null_vpn_expiration_date ? NULL_IDENTIFIER : p_vpn_expiration_date);
+                strcpy(pnt_user->email, is_null_email ? NULL_IDENTIFIER : p_email);
                 
                 #ifdef DEBUG_MODE
                 printf("POST %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s\n\n", pnt_user->iduser_idm, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_name, pnt_user->division, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email);
@@ -952,98 +927,98 @@ int main(int argc, char *argv[])
                         printf("i: %d\n", i);
                         printf("pnt_user->username: %s\n", pnt_user->username);
                         #endif
-                        strcpy(p_in_username, pnt_user->username);
-                        p_in_username_length = strlen(p_in_username);
+                        strcpy(p_username, pnt_user->username);
+                        p_username_length = strlen(p_username);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->name: %s\n", pnt_user->name);
                         #endif
-                        strcpy(p_in_name, pnt_user->name);
-                        p_in_name_length = strlen(p_in_name);
+                        strcpy(p_name, pnt_user->name);
+                        p_name_length = strlen(p_name);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->surname: %s\n", pnt_user->surname);
                         #endif
-                        strcpy(p_in_surname, pnt_user->surname);
-                        p_in_surname_length = strlen(p_in_surname);
+                        strcpy(p_surname, pnt_user->surname);
+                        p_surname_length = strlen(p_surname);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->uid: %d\n", pnt_user->uid);
                         #endif
-                        p_in_uid = pnt_user->uid;
+                        p_uid = pnt_user->uid;
                         #ifdef DEBUG_MODE
                         printf("pnt_user->gid: %d\n", pnt_user->gid);
                         #endif
-                        p_in_gid = pnt_user->gid;
+                        p_gid = pnt_user->gid;
                         #ifdef DEBUG_MODE
                         printf("pnt_user->group_name: %s\n", pnt_user->group_name);
                         #endif
-                        strcpy(p_in_group_name, pnt_user->group_name);
-                        p_in_group_name_length = strlen(p_in_group_name);
+                        strcpy(p_group_name, pnt_user->group_name);
+                        p_group_name_length = strlen(p_group_name);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->division: %s\n", pnt_user->division);
                         #endif
-                        strcpy(p_in_division, pnt_user->division);
-                        p_in_division_length = strlen(p_in_division);
+                        strcpy(p_division, pnt_user->division);
+                        p_division_length = strlen(p_division);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
                         #endif
-                        strcpy(p_in_creation_date, pnt_user->creation_date);
-                        p_in_creation_date_length = strlen(p_in_creation_date);
+                        strcpy(p_creation_date, pnt_user->creation_date);
+                        p_creation_date_length = strlen(p_creation_date);
                         
                         if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
                         {
                                 
-                                is_null_in_expiration_date = 0;
+                                is_null_expiration_date = 0;
                                 #ifdef DEBUG_MODE
                                 printf("exp not null\n");
                                 printf("pnt_user->expiration_date: %s\n", pnt_user->expiration_date);
                                 #endif
-                                strcpy(p_in_expiration_date, pnt_user->expiration_date);
-                                p_in_expiration_date_length = strlen(p_in_expiration_date);
+                                strcpy(p_expiration_date, pnt_user->expiration_date);
+                                p_expiration_date_length = strlen(p_expiration_date);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("exp null\n");
                                 #endif
-                                is_null_in_expiration_date = 1;
-                                p_in_expiration_date_length = 0;
+                                is_null_expiration_date = 1;
+                                p_expiration_date_length = 0;
                         }
                         
                         if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
                         {
-                                is_null_in_vpn_expiration_date = 0;
+                                is_null_vpn_expiration_date = 0;
                                 #ifdef DEBUG_MODE
                                 printf("vpn_exp not null\n");
                                 printf("pnt_user->vpn_expiration_date: %s\n", pnt_user->vpn_expiration_date);
                                 #endif
-                                strcpy(p_in_vpn_expiration_date, pnt_user->vpn_expiration_date);
-                                p_in_vpn_expiration_date_length = strlen(p_in_vpn_expiration_date);
+                                strcpy(p_vpn_expiration_date, pnt_user->vpn_expiration_date);
+                                p_vpn_expiration_date_length = strlen(p_vpn_expiration_date);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("vpn_exp null\n");
                                 #endif
-                                is_null_in_vpn_expiration_date = 1;
-                                p_in_vpn_expiration_date_length = 0;
+                                is_null_vpn_expiration_date = 1;
+                                p_vpn_expiration_date_length = 0;
                         }
                         
                         if(strcmp(pnt_user->email, NULL_IDENTIFIER))
                         {
-                                is_null_in_email = 0;
+                                is_null_email = 0;
                                 #ifdef DEBUG_MODE
                                 printf("mail not null\n");
                                 printf("pnt_user->email: %s\n", pnt_user->email);
                                 #endif
-                                strcpy(p_in_email, pnt_user->email);
-                                p_in_email_length = strlen(p_in_email);
+                                strcpy(p_email, pnt_user->email);
+                                p_email_length = strlen(p_email);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("mail null\n");
                                 #endif
-                                is_null_in_email = 1;
-                                p_in_email_length = 0;
+                                is_null_email = 1;
+                                p_email_length = 0;
                         }
                         
                         if((status = mysql_stmt_execute(insert_stmt)))
@@ -1059,101 +1034,101 @@ int main(int argc, char *argv[])
                         printf("i: %d\n", i);
                         printf("iduser_idm: %d\n", pnt_user->iduser_idm);
                         #endif
-                        p_up_iduser_idm = pnt_user->iduser_idm; // 
+                        p_iduser_idm = pnt_user->iduser_idm; // 
                         #ifdef DEBUG_MODE
                         printf("pnt_user->username: %s\n", pnt_user->username);
                         #endif
-                        strcpy(p_up_username, pnt_user->username);
-                        p_up_username_length = strlen(p_up_username);
+                        strcpy(p_username, pnt_user->username);
+                        p_username_length = strlen(p_username);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->name: %s\n", pnt_user->name);
                         #endif
-                        strcpy(p_up_name, pnt_user->name);
-                        p_up_name_length = strlen(p_up_name);
+                        strcpy(p_name, pnt_user->name);
+                        p_name_length = strlen(p_name);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->name: %s\n", pnt_user->name);
                         #endif
-                        strcpy(p_up_surname, pnt_user->surname);
-                        p_up_surname_length = strlen(p_up_surname);
+                        strcpy(p_surname, pnt_user->surname);
+                        p_surname_length = strlen(p_surname);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->uid: %d\n", pnt_user->uid);
                         #endif
-                        p_up_uid = pnt_user->uid;
+                        p_uid = pnt_user->uid;
                         #ifdef DEBUG_MODE
                         printf("pnt_user->gid: %d\n", pnt_user->gid);
                         #endif
-                        p_up_gid = pnt_user->gid;
+                        p_gid = pnt_user->gid;
                         #ifdef DEBUG_MODE
                         printf("pnt_user->group_name: %s\n", pnt_user->group_name);
                         #endif
-                        strcpy(p_up_group_name, pnt_user->group_name);
-                        p_up_group_name_length = strlen(p_up_group_name);
+                        strcpy(p_group_name, pnt_user->group_name);
+                        p_group_name_length = strlen(p_group_name);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->division: %s\n", pnt_user->division);
                         #endif
-                        strcpy(p_up_division, pnt_user->division);
-                        p_up_division_length = strlen(p_up_division);
+                        strcpy(p_division, pnt_user->division);
+                        p_division_length = strlen(p_division);
                         #ifdef DEBUG_MODE
                         printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
                         #endif
-                        strcpy(p_up_creation_date, pnt_user->creation_date);
-                        p_up_creation_date_length = strlen(p_up_creation_date);
+                        strcpy(p_creation_date, pnt_user->creation_date);
+                        p_creation_date_length = strlen(p_creation_date);
                         
                         if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
                         {
-                                is_null_up_expiration_date = 0;
+                                is_null_expiration_date = 0;
                                 #ifdef DEBUG_MODE
                                 printf("exp not null\n");
                                 printf("pnt_user->expiration_date: %s\n", pnt_user->expiration_date);
                                 #endif
-                                strcpy(p_up_expiration_date, pnt_user->expiration_date);
-                                p_up_expiration_date_length = strlen(p_up_expiration_date);
+                                strcpy(p_expiration_date, pnt_user->expiration_date);
+                                p_expiration_date_length = strlen(p_expiration_date);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("exp null\n");
                                 #endif
-                                is_null_up_expiration_date = 1;
-                                p_up_expiration_date_length = 0;
+                                is_null_expiration_date = 1;
+                                p_expiration_date_length = 0;
                         }
                         
                         if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
                         {
-                                is_null_up_vpn_expiration_date = 0;
+                                is_null_vpn_expiration_date = 0;
                                 #ifdef DEBUG_MODE
                                 printf("vpn_exp not null\n");
                                 printf("pnt_user->vpn_expiration_date: %s\n", pnt_user->vpn_expiration_date);
                                 #endif
-                                strcpy(p_up_vpn_expiration_date, pnt_user->vpn_expiration_date);
-                                p_up_vpn_expiration_date_length = strlen(p_up_vpn_expiration_date);
+                                strcpy(p_vpn_expiration_date, pnt_user->vpn_expiration_date);
+                                p_vpn_expiration_date_length = strlen(p_vpn_expiration_date);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("vpn_exp null\n");
                                 #endif
-                                is_null_up_vpn_expiration_date = 1;
-                                p_up_vpn_expiration_date_length = 0;
+                                is_null_vpn_expiration_date = 1;
+                                p_vpn_expiration_date_length = 0;
                         }
                         
                         if(strcmp(pnt_user->email, NULL_IDENTIFIER))
                         {
-                                is_null_up_email = 0;
+                                is_null_email = 0;
                                 #ifdef DEBUG_MODE
                                 printf("mail not null\n");
                                 printf("pnt_user->email: %s\n", pnt_user->email);
                                 #endif
-                                strcpy(p_up_email, pnt_user->email);
-                                p_up_email_length = strlen(p_up_email);
+                                strcpy(p_email, pnt_user->email);
+                                p_email_length = strlen(p_email);
                         }
                         else
                         {
                                 #ifdef DEBUG_MODE
                                 printf("mail null\n");
                                 #endif
-                                is_null_up_email = 1;
-                                p_up_email_length = 0;
+                                is_null_email = 1;
+                                p_email_length = 0;
                         }
                 
                         if((status = mysql_stmt_execute(update_stmt)))
