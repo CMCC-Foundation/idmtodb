@@ -90,6 +90,8 @@ enum
 
 #define DEFAULT_INPUT_FILE "user_idm.csv"
 
+#define MAX_PASSWORD_LEN 512
+
 #define MAX_USERNAME_LEN 16
 #define MAX_NAME_LEN 32
 #define MAX_SURNAME_LEN 32
@@ -183,21 +185,35 @@ int main(int argc, char *argv[])
 {
         const unsigned char prompt_on_insert = argc > 1 ? atoi(argv[1]): DEFAULT_PROMPT_ON_INSERT;
         const unsigned char prompt_on_update = argc > 2 ? atoi(argv[2]): DEFAULT_PROMPT_ON_UPDATE;
-        const char * input_file = argc > 3 ? argv[3] : DEFAULT_INPUT_FILE;
-        const char * server = argc > 4 ? argv[4] : USERSIDM_SERVER;
-        const char * user = argc > 5 ? argv[5] : USERSIDM_USER;
-        const char * password = argc > 6 ? argv[6] : USERSIDM_PASSWORD;
-        const char * database = argc > 7 ? argv[7] : USERSIDM_DATABASE;
-        const char * mail_cmd = argc > 8 ? argv[8] : DEFAULT_MAIL_COMMAND;
-        const char * from_mail = argc > 9 ? argv[9] : DEFAULT_FROM_MAIL;
-        const char * to_mail = argc > 10 ? argv[10] : NULL;
+        const int max_users = argc > 3 ? atoi(argv[3]) : MAX_USERS;
+        const char * input_file = argc > 4 ? argv[4] : DEFAULT_INPUT_FILE;
+        const char * server = argc > 5 ? argv[5] : USERSIDM_SERVER;
+        const char * user = argc > 6 ? argv[6] : USERSIDM_USER;
+        const char * password = argc > 7 ? argv[7] : USERSIDM_PASSWORD;
+        const char * database = argc > 8 ? argv[8] : USERSIDM_DATABASE;
+        const char * mail_cmd = argc > 9 ? argv[9] : DEFAULT_MAIL_COMMAND;
+        const char * from_mail = argc > 10 ? argv[10] : DEFAULT_FROM_MAIL;
+        const char * to_mail = argc > 11 ? argv[11] : NULL;
 
+        // char * token;
+
+        #ifdef DEBUG_MODE
+        char psw_asterisks[MAX_PASSWORD_LEN];
+        char *token_aux = psw_asterisks;
+        for(const char * token = password; *token != '\0'; ++token, ++token_aux)
+            *token_aux = '*';
+        *token_aux = '\0';
+
+        printf("prompt_on_insert: %u\nprompt_on_update: %u\nmax_users: %d\ninput_file: %s\nserver: %s\nuser: %s\npassword: %s\ndatabase: %s\nmail_cmd: %s\nfrom_mail: %s\nto_mail: %s\n",
+                prompt_on_insert, prompt_on_update, max_users, input_file, server, user, psw_asterisks, database, mail_cmd, from_mail, to_mail);
+        // exit(0);
+        #endif
 
         char mail_cmd_to[MAX_MAILCMDTO_LEN];
 
         if(to_mail)
-        sprintf(mail_cmd_to, "%s \"%s\"", mail_cmd, to_mail);
-
+            sprintf(mail_cmd_to, "%s \"%s\"", mail_cmd, to_mail);
+            
         #define is_mail_active (from_mail && to_mail)
 
         FILE * fp;
@@ -554,7 +570,7 @@ int main(int argc, char *argv[])
         char buf[MAX_LINE_LEN];
         char * token = NULL;
         char * token2 = NULL;
-        idm_user_t users[MAX_USERS];
+        idm_user_t users[max_users];
         idm_user_t * pnt_user = NULL;
         
         printf("\n");
@@ -656,7 +672,7 @@ int main(int argc, char *argv[])
         int rows;
         int result;
         
-        idm_user_t users_db[MAX_USERS];
+        idm_user_t users_db[max_users];
         
         for(rows=0; !(result = mysql_stmt_fetch(select_stmt)); ++rows)
         {
@@ -697,12 +713,13 @@ int main(int argc, char *argv[])
         idm_user_t * pnt_user_db = NULL;
         
         /*
-        id_idm_user_t users_idm_to_update[MAX_USERS];
-        idm_user_t users_idm_to_insert[MAX_USERS];
+        id_idm_user_t users_idm_to_update[max_users];
+        idm_user_t users_idm_to_insert[max_users];
         */
         
         // COMPARISON CODE
-        printf("line_num: %d\n", line_num);
+        printf("line_num: %d\n\n", line_num);
+        
         for(i=0; i<line_num; ++i)
         {
                 pnt_user = &users[i];
@@ -712,7 +729,11 @@ int main(int argc, char *argv[])
                         // printf("idm_uid: %d, db_uid: %d\n", pnt_user->uid, pnt_user_db->uid);
                         if(pnt_user->uid == pnt_user_db->uid)
                         {
+                                /*
+                                #ifdef DEBUG_MODE
                                 printf("Hallelujah\n");
+                                #endif
+                                */
                                 if(strcmp(pnt_user->username, pnt_user_db->username) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)||
                                    pnt_user->gid != pnt_user_db->gid || strcmp(pnt_user->group_name, pnt_user_db->group_name) || strcmp(pnt_user->division, pnt_user_db->division)  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
