@@ -19,7 +19,7 @@
 PROMPT_ON_INSERT=${1:-"1"}
 PROMPT_ON_UPDATE=${2:-"1"}
 MAX_USERS=${3:-"1000"}
-INPUT_FILE=${4:"user_idm_$(date '+%Y-%m-%d').csv"} #"user_idm_02052023.csv"
+INPUT_FILE=${4:-"user_idm_$(date '+%Y-%m-%d').csv"} #"user_idm_02052023.csv"
 USERSIDM_SERVER=${5:-"127.0.0.1"}
 USERSIDM_USER=${6:-"root"}
 USERSIDM_PASSWORD="root"
