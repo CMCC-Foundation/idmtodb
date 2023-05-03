@@ -28,7 +28,7 @@
 #define PADDING "                                                     " // "#####################################################"
 #define BORDER  "-----------------------------------------------------" 
 
-#define DEBUG_MODE
+// #define DEBUG_MODE
 #define INSERT_USER "CALL insert_user(?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_USER "CALL update_user(?,?,?,?,?,?,?,?,?,?,?,?)"
 #define SELECT_ALL_USERS "CALL select_all_users( )"
@@ -242,8 +242,9 @@ int main(int argc, char *argv[])
         MYSQL_BIND ps_update_user_params[MAX_UPDATE_USER_PARAMS];
         // MYSQL_BIND out_params[MAX_INSERT_USER_PARAMS];
 
+	#ifdef DEBUG_MODE
         printf("connected to database!\n");   
-
+	#endif
 
         /* initialize and prepare CALL statement with parameter placeholders */
         #ifdef DEBUG_MODE
