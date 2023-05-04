@@ -723,6 +723,7 @@ int main(int argc, char *argv[])
         }
         
         int to_insert = 0;
+        register unsigned char headered = 0;
         const char * padding = PADDING; //  "#####################################################";
         const char * border_padding = BORDER; 
         char p_numbers[2][33]; // for uid and gid, respectively
@@ -737,18 +738,25 @@ int main(int argc, char *argv[])
         sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_name%*.*s| division%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 5, 5, padding, 7, 7, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAME_LEN, _MAX_GROUP_NAME_LEN, border_padding, _MAX_DIVISION_LEN, _MAX_DIVISION_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding);
         
-        printf(border_buffer);
-        printf(buffer);
-        printf(border_buffer);
+        
         
         sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><td>username</td><td>name</td><td>surname</td><td>uid</td><td>gid</td><td>group_name</td><td>division</td><td>creation_date</td><td>expiration_date</td><td>vpn_expiration_date</td><td>email</td></tr><br>");
 
         for(i=0; i<line_num; ++i)
         {
+
                 pnt_user = &users[i];
                 // printf("iduser_idm: %d\n", pnt_user->iduser_idm);
                 if(pnt_user->iduser_idm == INSERT_CODE) // INSERT_CODE
                 {
+                        if(!headered)
+                        {
+                                headered = 1;
+                                printf(border_buffer);
+                                printf(buffer);
+                                printf(border_buffer);
+                        }
+                
                         ++ to_insert;
                         padLens[0] = MAX_USERNAME_LEN - strlen(pnt_user->username) -1;
                         padLens[1] = _MAX_NAME_LEN - strlen(pnt_user->name) -1;
@@ -799,7 +807,13 @@ int main(int argc, char *argv[])
                 } 
         }
         
-        printf(border_buffer);
+        if(headered)
+                printf(border_buffer);
+        
+        headered = 0;
+        
+        char ch;
+        register unsigned char prompted_to_insert = 0;
         
         if(to_insert)
         {
@@ -809,9 +823,12 @@ int main(int argc, char *argv[])
                 {
                         printf("Would you like to proceed? [Y/n]\n");
                         
-                        char ch;
+                        // char ch;
                         
                         // printf("PRESS KEY: %c\n", ch);
+                        
+                        // (void) getchar();
+                        prompted_to_insert = 1;
                         
                         if((ch = getchar()) == 'n')
                                 to_insert = 0;
@@ -822,15 +839,14 @@ int main(int argc, char *argv[])
                 }
                 printf("\n\n");
         }
-              
+        
+        #ifdef DEBUG_MODE
+        printf("chinsert: %c\n", ch);
+        #endif
               
         sprintf(mail_buffer, "%s<br></table><br>%d results INSERTED into the %s DB.</p><br><br><br>", mail_buffer, to_insert, database);      
                 
         int to_update = 0;
-        
-        printf(border_buffer);
-        printf(buffer);
-        printf(border_buffer);
         
         sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><td>username</td><td>name</td><td>surname</td><td>uid</td><td>gid</td><td>group_name</td><td>division</td><td>creation_date</td><td>expiration_date</td><td>vpn_expiration_date</td><td>email</td></tr><br>");
         
@@ -840,6 +856,14 @@ int main(int argc, char *argv[])
                 // printf("iduser_idm: %d\n", pnt_user->iduser_idm);
                 if(pnt_user->iduser_idm >= 0) // UPDATE_CODE
                 {
+                        if(!headered)
+                        {
+                                headered = 1;
+                                printf(border_buffer);
+                                printf(buffer);
+                                printf(border_buffer);
+                        }
+                        
                         ++ to_update;
                         padLens[0] = MAX_USERNAME_LEN - strlen(pnt_user->username) -1;
                         padLens[1] = _MAX_NAME_LEN - strlen(pnt_user->name) -1;
@@ -890,7 +914,8 @@ int main(int argc, char *argv[])
                 } 
         }
         
-        printf(border_buffer);
+        if(headered)
+                printf(border_buffer);
         
         if(to_update)
         {
@@ -900,11 +925,12 @@ int main(int argc, char *argv[])
                 {
                         printf("Would you like to proceed? [Y/n]\n");
                         
-                        char ch;
+                        // char ch;
                         
                         // printf("PRESS KEY: %c\n", ch);
                         
-                        (void) getchar();
+                        if(prompted_to_insert)
+                                (void) getchar();
                         
                         if((ch = getchar()) == 'n')
                                 to_update = 0;
@@ -920,138 +946,159 @@ int main(int argc, char *argv[])
         
         register unsigned char _to_insert = 0;
         register unsigned char _to_update = 0;
+        
+        register unsigned char inserted = 0;
+        register unsigned char updated = 0;
+        
         MYSQL_STMT * this_stmt = NULL;
         
-        for(i=0; i<line_num; ++i)
+        #ifdef DEBUG_MODE
+        printf("to_insert: %d\nto_update: %d, ch: %c\n", to_insert, to_update, ch);
+        #endif
+        
+        if(to_insert || to_update)
         {
-                pnt_user = &users[i];
-                
-                _to_insert = to_insert && pnt_user->iduser_idm == INSERT_CODE;
-                _to_update = to_update && pnt_user->iduser_idm >= 0;
-                
-                if(_to_insert || _to_update)
+                for(i=0; i<line_num; ++i)
                 {
-                
-                        #ifdef DEBUG_MODE
-                        printf("i: %d\n", i);
-                        printf("pnt_user->username: %s\n", pnt_user->username);
-                        #endif
-                        strcpy(p_username, pnt_user->username);
-                        p_username_length = strlen(p_username);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->name: %s\n", pnt_user->name);
-                        #endif
-                        strcpy(p_name, pnt_user->name);
-                        p_name_length = strlen(p_name);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->surname: %s\n", pnt_user->surname);
-                        #endif
-                        strcpy(p_surname, pnt_user->surname);
-                        p_surname_length = strlen(p_surname);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->uid: %d\n", pnt_user->uid);
-                        #endif
-                        p_uid = pnt_user->uid;
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->gid: %d\n", pnt_user->gid);
-                        #endif
-                        p_gid = pnt_user->gid;
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->group_name: %s\n", pnt_user->group_name);
-                        #endif
-                        strcpy(p_group_name, pnt_user->group_name);
-                        p_group_name_length = strlen(p_group_name);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->division: %s\n", pnt_user->division);
-                        #endif
-                        strcpy(p_division, pnt_user->division);
-                        p_division_length = strlen(p_division);
-                        #ifdef DEBUG_MODE
-                        printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
-                        #endif
-                        strcpy(p_creation_date, pnt_user->creation_date);
-                        p_creation_date_length = strlen(p_creation_date);
+                        pnt_user = &users[i];
                         
-                        if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
-                        {
-                                
-                                is_null_expiration_date = 0;
-                                #ifdef DEBUG_MODE
-                                printf("exp not null\n");
-                                printf("pnt_user->expiration_date: %s\n", pnt_user->expiration_date);
-                                #endif
-                                strcpy(p_expiration_date, pnt_user->expiration_date);
-                                p_expiration_date_length = strlen(p_expiration_date);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("exp null\n");
-                                #endif
-                                is_null_expiration_date = 1;
-                                p_expiration_date_length = 0;
-                        }
+                        _to_insert = to_insert && pnt_user->iduser_idm == INSERT_CODE;
+                        _to_update = to_update && pnt_user->iduser_idm >= 0;
                         
-                        if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
+                        if(_to_insert || _to_update)
                         {
-                                is_null_vpn_expiration_date = 0;
-                                #ifdef DEBUG_MODE
-                                printf("vpn_exp not null\n");
-                                printf("pnt_user->vpn_expiration_date: %s\n", pnt_user->vpn_expiration_date);
-                                #endif
-                                strcpy(p_vpn_expiration_date, pnt_user->vpn_expiration_date);
-                                p_vpn_expiration_date_length = strlen(p_vpn_expiration_date);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("vpn_exp null\n");
-                                #endif
-                                is_null_vpn_expiration_date = 1;
-                                p_vpn_expiration_date_length = 0;
-                        }
                         
-                        if(strcmp(pnt_user->email, NULL_IDENTIFIER))
-                        {
-                                is_null_email = 0;
-                                #ifdef DEBUG_MODE
-                                printf("mail not null\n");
-                                printf("pnt_user->email: %s\n", pnt_user->email);
-                                #endif
-                                strcpy(p_email, pnt_user->email);
-                                p_email_length = strlen(p_email);
-                        }
-                        else
-                        {
-                                #ifdef DEBUG_MODE
-                                printf("mail null\n");
-                                #endif
-                                is_null_email = 1;
-                                p_email_length = 0;
-                        }
-                
-                        if(_to_update)
-                        {
                                 #ifdef DEBUG_MODE
                                 printf("i: %d\n", i);
-                                printf("iduser_idm: %d\n", pnt_user->iduser_idm);
+                                printf("pnt_user->username: %s\n", pnt_user->username);
                                 #endif
-                                p_iduser_idm = pnt_user->iduser_idm; // 
-                                this_stmt = update_stmt;
+                                strcpy(p_username, pnt_user->username);
+                                p_username_length = strlen(p_username);
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->name: %s\n", pnt_user->name);
+                                #endif
+                                strcpy(p_name, pnt_user->name);
+                                p_name_length = strlen(p_name);
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->surname: %s\n", pnt_user->surname);
+                                #endif
+                                strcpy(p_surname, pnt_user->surname);
+                                p_surname_length = strlen(p_surname);
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->uid: %d\n", pnt_user->uid);
+                                #endif
+                                p_uid = pnt_user->uid;
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->gid: %d\n", pnt_user->gid);
+                                #endif
+                                p_gid = pnt_user->gid;
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->group_name: %s\n", pnt_user->group_name);
+                                #endif
+                                strcpy(p_group_name, pnt_user->group_name);
+                                p_group_name_length = strlen(p_group_name);
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->division: %s\n", pnt_user->division);
+                                #endif
+                                strcpy(p_division, pnt_user->division);
+                                p_division_length = strlen(p_division);
+                                #ifdef DEBUG_MODE
+                                printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
+                                #endif
+                                strcpy(p_creation_date, pnt_user->creation_date);
+                                p_creation_date_length = strlen(p_creation_date);
+                                
+                                if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
+                                {
+                                        
+                                        is_null_expiration_date = 0;
+                                        #ifdef DEBUG_MODE
+                                        printf("exp not null\n");
+                                        printf("pnt_user->expiration_date: %s\n", pnt_user->expiration_date);
+                                        #endif
+                                        strcpy(p_expiration_date, pnt_user->expiration_date);
+                                        p_expiration_date_length = strlen(p_expiration_date);
+                                }
+                                else
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("exp null\n");
+                                        #endif
+                                        is_null_expiration_date = 1;
+                                        p_expiration_date_length = 0;
+                                }
+                                
+                                if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
+                                {
+                                        is_null_vpn_expiration_date = 0;
+                                        #ifdef DEBUG_MODE
+                                        printf("vpn_exp not null\n");
+                                        printf("pnt_user->vpn_expiration_date: %s\n", pnt_user->vpn_expiration_date);
+                                        #endif
+                                        strcpy(p_vpn_expiration_date, pnt_user->vpn_expiration_date);
+                                        p_vpn_expiration_date_length = strlen(p_vpn_expiration_date);
+                                }
+                                else
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("vpn_exp null\n");
+                                        #endif
+                                        is_null_vpn_expiration_date = 1;
+                                        p_vpn_expiration_date_length = 0;
+                                }
+                                
+                                if(strcmp(pnt_user->email, NULL_IDENTIFIER))
+                                {
+                                        is_null_email = 0;
+                                        #ifdef DEBUG_MODE
+                                        printf("mail not null\n");
+                                        printf("pnt_user->email: %s\n", pnt_user->email);
+                                        #endif
+                                        strcpy(p_email, pnt_user->email);
+                                        p_email_length = strlen(p_email);
+                                }
+                                else
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("mail null\n");
+                                        #endif
+                                        is_null_email = 1;
+                                        p_email_length = 0;
+                                }
+                        
+                                if(_to_update)
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("i: %d\n", i);
+                                        printf("iduser_idm: %d\n", pnt_user->iduser_idm);
+                                        #endif
+                                        p_iduser_idm = pnt_user->iduser_idm; // 
+                                        this_stmt = update_stmt;
+                                }
+                                else
+                                        this_stmt = insert_stmt;
+                            
+                                if((status = mysql_stmt_execute(this_stmt)))
+                                {             
+                                        fprintf(stderr, "Error on mysql_stmt_execute: %d\n", status);
+                                        fprintf(stderr, "Error: %s\n", mysql_stmt_error(this_stmt));
+                                        exit(1);
+                                }
+                                
+                                if(_to_insert)
+                                        inserted = 1;
+                                else
+                                        updated = 1;
+                        
                         }
-                        else
-                                this_stmt = insert_stmt;
-                    
-                        if((status = mysql_stmt_execute(this_stmt)))
-                        {
-                                fprintf(stderr, "Error on mysql_stmt_execute: %d\n", status);
-                                fprintf(stderr, "Error: %s\n", mysql_stmt_error(this_stmt));
-                                exit(1);
-                        }
-                
+                        
+                        
                 }
                 
-                
+                if(inserted)
+                    printf("%d records have been successfully INSERTED into the %s DB.\n\n", to_insert, database);
+                if(updated)
+                    printf("%d records have been successfully UPDATED into the %s DB.\n\n", to_update, database);
         }
            
         mysql_stmt_close(insert_stmt);
