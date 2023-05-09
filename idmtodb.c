@@ -737,10 +737,8 @@ int main(int argc, char *argv[])
         
         sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_name%*.*s| division%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 5, 5, padding, 7, 7, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAME_LEN, _MAX_GROUP_NAME_LEN, border_padding, _MAX_DIVISION_LEN, _MAX_DIVISION_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding);
-        
-        
-        
-        sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><td>username</td><td>name</td><td>surname</td><td>uid</td><td>gid</td><td>group_name</td><td>division</td><td>creation_date</td><td>expiration_date</td><td>vpn_expiration_date</td><td>email</td></tr><br>");
+         
+        sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr><br>");
 
         for(i=0; i<line_num; ++i)
         {
@@ -802,7 +800,7 @@ int main(int argc, char *argv[])
                     
                                 printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_name, padLens[3], padLens[3], padding, pnt_user->division, padLens[4], padLens[4], padding, pnt_user->creation_date, padLens[5], padLens[5], padding, pnt_user->expiration_date, padLens[6], padLens[6], padding, pnt_user->vpn_expiration_date, padLens[7], padLens[7], padding, pnt_user->email, padLens[8], padLens[8], padding);
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_name, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_name, pnt_user->division, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email);
                         
                 } 
         }
@@ -848,7 +846,7 @@ int main(int argc, char *argv[])
                 
         int to_update = 0;
         
-        sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><td>username</td><td>name</td><td>surname</td><td>uid</td><td>gid</td><td>group_name</td><td>division</td><td>creation_date</td><td>expiration_date</td><td>vpn_expiration_date</td><td>email</td></tr><br>");
+        sprintf(mail_buffer, "%s<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr><br>", mail_buffer);
         
         for(i=0; i<line_num; ++i)
         {
@@ -909,7 +907,7 @@ int main(int argc, char *argv[])
                     
                                 printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_name, padLens[3], padLens[3], padding, pnt_user->division, padLens[4], padLens[4], padding, pnt_user->creation_date, padLens[5], padLens[5], padding, pnt_user->expiration_date, padLens[6], padLens[6], padding, pnt_user->vpn_expiration_date, padLens[7], padLens[7], padding, pnt_user->email, padLens[8], padLens[8], padding);
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_name, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_name, pnt_user->division, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email);
                         
                 } 
         }
@@ -1095,24 +1093,30 @@ int main(int argc, char *argv[])
                         
                 }
                 
-                if(inserted)
-                    printf("%d records have been successfully INSERTED into the %s DB.\n\n", to_insert, database);
-                if(updated)
-                    printf("%d records have been successfully UPDATED into the %s DB.\n\n", to_update, database);
+                if(inserted || updated)
+                {
+                    if(inserted)
+                        printf("%d records have been successfully INSERTED into the %s DB.\n\n", to_insert, database);
+                    if(updated)
+                        printf("%d records have been successfully UPDATED into the %s DB.\n\n", to_update, database);
+                        
+                    if(is_mail_active)
+                    {
+                        sendmail(from_mail, to_mail, mail_cmd_to, mail_buffer);
+                        
+                        #ifdef DEBUG_MODE
+                            printf("mail_buffer length: %ld\n", strlen(mail_buffer));
+                        #endif
+                    }
+                }
         }
            
         mysql_stmt_close(insert_stmt);
         mysql_stmt_close(update_stmt);
         mysql_close(conn); 
         
-        #ifdef DEBUG_MODE
-        printf("mail_buffer length: %ld\n", strlen(mail_buffer));
-        #endif
         
-        if(is_mail_active)
-                sendmail(from_mail, to_mail, mail_cmd_to, mail_buffer);
-    
-
+        
         #undef is_mail_active 
                         
         return 0;
