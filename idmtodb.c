@@ -738,7 +738,7 @@ int main(int argc, char *argv[])
         sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_name%*.*s| division%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 5, 5, padding, 7, 7, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAME_LEN, _MAX_GROUP_NAME_LEN, border_padding, _MAX_DIVISION_LEN, _MAX_DIVISION_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding);
          
-        sprintf(mail_buffer, "<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr><br>");
+        sprintf(mail_buffer, "<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr>");
 
         for(i=0; i<line_num; ++i)
         {
@@ -842,11 +842,11 @@ int main(int argc, char *argv[])
         printf("chinsert: %c\n", ch);
         #endif
               
-        sprintf(mail_buffer, "%s<br></table><br>%d results INSERTED into the %s DB.</p><br><br><br>", mail_buffer, to_insert, database);      
+        sprintf(mail_buffer, "%s</table><p>%d results INSERTED into the %s DB.</p><br>", mail_buffer, to_insert, database);      
                 
         int to_update = 0;
         
-        sprintf(mail_buffer, "%s<p style=\"background-color: black;\"><table style=\"background-color: black; color: #adff29;\"><br><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr><br>", mail_buffer);
+        sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th></tr>", mail_buffer);
         
         for(i=0; i<line_num; ++i)
         {
@@ -940,7 +940,7 @@ int main(int argc, char *argv[])
                 printf("\n\n");
         }
         
-        sprintf(mail_buffer, "%s<br></table><br>%d results UPDATED into the %s DB.</p><br><br><br>", mail_buffer, to_update, database);    
+        sprintf(mail_buffer, "%s</table><p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database);    
         
         register unsigned char _to_insert = 0;
         register unsigned char _to_update = 0;
