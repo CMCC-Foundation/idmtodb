@@ -37,6 +37,8 @@ CREATE TABLE `user_idm` (
   `email` varchar(64) DEFAULT NULL,
   `notes` varchar(256) DEFAULT NULL,
   `closing_date` date DEFAULT NULL,
+  `no_cmcc` tinyint(1) GENERATED ALWAYS AS ((`group_name` = _utf8mb3'juno-ext')) VIRTUAL,
+  `status` tinyint(1) GENERATED ALWAYS AS ((`closing_date` is not null)) VIRTUAL,
   PRIMARY KEY (`iduser_idm`)
 ) ENGINE=InnoDB AUTO_INCREMENT=196 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -184,4 +186,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-04  3:32:36
+-- Dump completed on 2023-06-04 13:04:14
