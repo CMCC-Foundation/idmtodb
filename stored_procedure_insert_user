@@ -1,4 +1,4 @@
-use users_idm;
+use idmdb_wip;
 
 DELIMITER ;; 
 DROP PROCEDURE IF EXISTS insert_user;
@@ -7,8 +7,8 @@ CREATE PROCEDURE insert_user
 	 IN p_username VARCHAR(16),
      IN p_name VARCHAR(32),
      IN p_surname VARCHAR(32),
-     IN p_uid INT(11),
-     IN p_gid INT(11),
+     IN p_uid INT,
+     IN p_gid INT,
      IN p_group_name VARCHAR(32),
      IN p_division VARCHAR(32),
      IN p_creation_date DATE,
@@ -16,8 +16,12 @@ CREATE PROCEDURE insert_user
      IN p_vpn_expiration_date DATE,
      IN p_email VARCHAR(64)
 )  
-   BEGIN  
-	INSERT INTO user_idm (username, name, surname, uid, gid, group_name, division, creation_date, expiration_date, vpn_expiration_date, email)
-    VALUES (p_username, p_name, p_surname, p_uid, p_gid, p_group_name, p_division, p_creation_date, p_expiration_date, p_vpn_expiration_date, p_email);
+   BEGIN
+   	DECLARE user_idm_lid INT;
+	INSERT INTO user_idm (username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email)
+    VALUES (p_username, p_name, p_surname, p_uid, p_gid, p_creation_date, p_expiration_date, p_vpn_expiration_date, p_email);
+    	SET user_idm_lid = LAST_INSERT_ID();
+    	INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, 0 FROM idmdb_wip.group WHERE name=p_division;	
+    	INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, 1 FROM idmdb_wip.group WHERE name=p_group_name;
    END
    ;;

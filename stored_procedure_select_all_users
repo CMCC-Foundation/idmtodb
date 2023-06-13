@@ -1,4 +1,4 @@
-use users_idm;
+use idmdb_wip;
 
 DELIMITER ;; 
 DROP PROCEDURE IF EXISTS select_all_users;
@@ -6,6 +6,6 @@ CREATE PROCEDURE select_all_users
 ( 
 )  
    BEGIN  
-	SELECT iduser_idm, username, name, surname, uid, gid, group_name, division, creation_date, expiration_date, vpn_expiration_date, email FROM user_idm;
+	SELECT iduser_idm, username, name, surname, uid, gid, group_name, division, creation_date, expiration_date, vpn_expiration_date, email, closing_date FROM user_gd_idm;
    END
    ;;

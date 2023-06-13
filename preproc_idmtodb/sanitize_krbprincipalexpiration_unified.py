@@ -10,7 +10,7 @@ DEBUG_MODE=False #True
 #print("users_dict len: {}".format(len(users_dict)))
 cnt=0
 cnt_managed=0
-divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas"] #, "cmcc", "scc", "ext"]
+divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
 jolly_groups=["ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
 print("username,name,surname,uid,gid,group_name,division,creation_date,expiration_date,vpn_expiration_date,email,closing_date") #,no_cmcc,closing_date,status")I
