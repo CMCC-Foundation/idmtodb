@@ -1,7 +1,7 @@
 use idmdb_wip;
 
 DELIMITER ;; 
-#DROP PROCEDURE IF EXISTS update_user;
+DROP PROCEDURE IF EXISTS update_user;
 CREATE PROCEDURE update_user
 ( 
 	 IN p_iduser_idm INT,
