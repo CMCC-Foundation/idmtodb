@@ -18,7 +18,7 @@
 
 PROMPT_ON_INSERT=${1:-"1"}
 PROMPT_ON_UPDATE=${2:-"1"}
-PROMPT_ON_UPDATE=${3:-"1"}
+PROMPT_ON_UPDATE=${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
 MAX_USERS=${4:-"1000"}
 INPUT_FILE=${5:-"user_idm_$(date '+%Y-%m-%d').csv"} #"user_idm_02052023.csv"
 USERSIDM_SERVER=${5:-"127.0.0.1"}

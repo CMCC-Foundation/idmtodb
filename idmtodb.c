@@ -131,6 +131,8 @@ enum
 #define DELETE_CODE -97
 #define UPDATE_PRES_CODE -96
 
+#define NO_DELETE_CODE 2
+
 typedef struct _idm_user_t
 {
         int iduser_idm; // 
@@ -1090,104 +1092,107 @@ int main(int argc, char *argv[])
         
         int to_delete = 0;
         
-        for(j=0; j<rows; ++j)
+        if(prompt_on_delete < NO_DELETE_CODE)
         {
-                pnt_user_db = &users_db[j];
-                // printf("iduser_idm: %d\n", pnt_user->iduser_idm);
-                if(pnt_user_db->iduser_idm == DELETE_CODE) // UPDATE_CODE
+                for(j=0; j<rows; ++j)
                 {
-                        if(!headered)
+                        pnt_user_db = &users_db[j];
+                        // printf("iduser_idm: %d\n", pnt_user->iduser_idm);
+                        if(pnt_user_db->iduser_idm == DELETE_CODE) // UPDATE_CODE
                         {
-                                sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th></tr>\n", mail_buffer);
-                                headered = 1;
-                                printf(border_buffer);
-                                printf(buffer);
-                                printf(border_buffer);
-                        }
-                        
-                        ++ to_delete;
-                        padLens[0] = MAX_USERNAME_LEN - strlen(pnt_user_db->username) -1;
-                        padLens[1] = _MAX_NAME_LEN - strlen(pnt_user_db->name) -1;
-                        
-                        if(padLens[1] <= 0)
-                                padLens[1] = 0;
-                        
-                        padLens[2] = _MAX_SURNAME_LEN - strlen(pnt_user_db->surname) -1;
-                        
-                        if(padLens[2] <= 0)
-                                padLens[2] = 0;
-                        
-                        padLens[3] = _MAX_GROUP_NAME_LEN - strlen(pnt_user_db->group_name) -1;
-                        
-                        if(padLens[3] <= 0)
-                                padLens[3] = 0;
-                        
-                        padLens[4] = _MAX_DIVISION_LEN - strlen(pnt_user_db->division) -1;
-                        
-                        if(padLens[4] <= 0)
-                                padLens[4] = 0;
-                        
-                        padLens[5] = _MAX_DATE_LEN - strlen(pnt_user_db->creation_date) -1;
-                        padLens[6] = _MAX_DATE_LEN - strlen(pnt_user_db->expiration_date) -1;
-                        padLens[7] = _MAX_DATE_LEN - strlen(pnt_user_db->vpn_expiration_date) -1;
+                                if(!headered)
+                                {
+                                        sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_name</th><th>division</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th></tr>\n", mail_buffer);
+                                        headered = 1;
+                                        printf(border_buffer);
+                                        printf(buffer);
+                                        printf(border_buffer);
+                                }
+                                
+                                ++ to_delete;
+                                padLens[0] = MAX_USERNAME_LEN - strlen(pnt_user_db->username) -1;
+                                padLens[1] = _MAX_NAME_LEN - strlen(pnt_user_db->name) -1;
+                                
+                                if(padLens[1] <= 0)
+                                        padLens[1] = 0;
+                                
+                                padLens[2] = _MAX_SURNAME_LEN - strlen(pnt_user_db->surname) -1;
+                                
+                                if(padLens[2] <= 0)
+                                        padLens[2] = 0;
+                                
+                                padLens[3] = _MAX_GROUP_NAME_LEN - strlen(pnt_user_db->group_name) -1;
+                                
+                                if(padLens[3] <= 0)
+                                        padLens[3] = 0;
+                                
+                                padLens[4] = _MAX_DIVISION_LEN - strlen(pnt_user_db->division) -1;
+                                
+                                if(padLens[4] <= 0)
+                                        padLens[4] = 0;
+                                
+                                padLens[5] = _MAX_DATE_LEN - strlen(pnt_user_db->creation_date) -1;
+                                padLens[6] = _MAX_DATE_LEN - strlen(pnt_user_db->expiration_date) -1;
+                                padLens[7] = _MAX_DATE_LEN - strlen(pnt_user_db->vpn_expiration_date) -1;
 
-                        padLens[8] = _MAX_EMAIL_LEN - strlen(pnt_user_db->email) -1;
-                        
-                        padLens[9] = _MAX_DATE_LEN - strlen(pnt_user_db->closing_date) -1;
-                        
-                        sprintf(p_numbers[0], "%d", pnt_user_db->uid);
-                        numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
-                        sprintf(p_numbers[1], "%d", pnt_user_db->gid);
-                        numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
-                        
-                        /*
-                        #ifdef DEBUG_MODE
-                        printf("strlen username: %d, padlens 0: %d\n", strlen(pnt_user_db->username), padLens[0]);
-                        printf("strlen mail: %d, padlens 8: %d\n", mail_len, padLens[8]);
-                        #endif
-                        */
-                                                
-                        if(padLens[8] <= 0)
-                                padLens[8] = 0;   
-                    
-                                printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user_db->username, padLens[0], padLens[0], padding, pnt_user_db->name, padLens[1], padLens[1], padding, pnt_user_db->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user_db->group_name, padLens[3], padLens[3], padding, pnt_user_db->division, padLens[4], padLens[4], padding, pnt_user_db->creation_date, padLens[5], padLens[5], padding, pnt_user_db->expiration_date, padLens[6], padLens[6], padding, pnt_user_db->vpn_expiration_date, padLens[7], padLens[7], padding, pnt_user_db->email, padLens[8], padLens[8], padding, pnt_user_db->closing_date, padLens[9], padLens[9], padding);
+                                padLens[8] = _MAX_EMAIL_LEN - strlen(pnt_user_db->email) -1;
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>\n", mail_buffer, pnt_user_db->username, pnt_user_db->name, pnt_user_db->surname, pnt_user_db->uid, pnt_user_db->gid, pnt_user_db->group_name, pnt_user_db->division, pnt_user_db->creation_date, pnt_user_db->expiration_date, pnt_user_db->vpn_expiration_date, pnt_user_db->email, pnt_user_db->closing_date);
-                        
-                } 
-        }
-        
-        if(headered)
-                printf(border_buffer);
-        
-        if(to_delete)
-        {
-                printf("\n\nThe following %d records have to be DELETED from the %s DB. ", to_delete, database);
-                
-                if(prompt_on_delete)
-                {
-                        printf("Would you like to proceed? [Y/n]\n");
-                        
-                        // char ch;
-                        
-                        // printf("PRESS KEY: %c\n", ch);
-                        
-                        if(prompted_to_insert)
-                                (void) getchar();
-                        
-                        if((ch = getchar()) == 'n')
-                        {
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
-                                to_delete = 0;
-                        }
-                        else
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                padLens[9] = _MAX_DATE_LEN - strlen(pnt_user_db->closing_date) -1;
                                 
-                        #ifdef DEBUG_MODE 
-                        printf("PRESSED KEY: %c\n", ch);
-                        #endif
+                                sprintf(p_numbers[0], "%d", pnt_user_db->uid);
+                                numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
+                                sprintf(p_numbers[1], "%d", pnt_user_db->gid);
+                                numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
+                                
+                                /*
+                                #ifdef DEBUG_MODE
+                                printf("strlen username: %d, padlens 0: %d\n", strlen(pnt_user_db->username), padLens[0]);
+                                printf("strlen mail: %d, padlens 8: %d\n", mail_len, padLens[8]);
+                                #endif
+                                */
+                                                        
+                                if(padLens[8] <= 0)
+                                        padLens[8] = 0;   
+                            
+                                        printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user_db->username, padLens[0], padLens[0], padding, pnt_user_db->name, padLens[1], padLens[1], padding, pnt_user_db->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user_db->group_name, padLens[3], padLens[3], padding, pnt_user_db->division, padLens[4], padLens[4], padding, pnt_user_db->creation_date, padLens[5], padLens[5], padding, pnt_user_db->expiration_date, padLens[6], padLens[6], padding, pnt_user_db->vpn_expiration_date, padLens[7], padLens[7], padding, pnt_user_db->email, padLens[8], padLens[8], padding, pnt_user_db->closing_date, padLens[9], padLens[9], padding);
+                                        
+                                sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>\n", mail_buffer, pnt_user_db->username, pnt_user_db->name, pnt_user_db->surname, pnt_user_db->uid, pnt_user_db->gid, pnt_user_db->group_name, pnt_user_db->division, pnt_user_db->creation_date, pnt_user_db->expiration_date, pnt_user_db->vpn_expiration_date, pnt_user_db->email, pnt_user_db->closing_date);
+                                
+                        } 
                 }
-                printf("\n\n");
+                
+                if(headered)
+                        printf(border_buffer);
+                
+                if(to_delete)
+                {
+                        printf("\n\nThe following %d records have to be DELETED from the %s DB. ", to_delete, database);
+                        
+                        if(prompt_on_delete)
+                        {
+                                printf("Would you like to proceed? [Y/n]\n");
+                                
+                                // char ch;
+                                
+                                // printf("PRESS KEY: %c\n", ch);
+                                
+                                if(prompted_to_insert)
+                                        (void) getchar();
+                                
+                                if((ch = getchar()) == 'n')
+                                {
+                                        sprintf(mail_buffer, "%s</table>\n<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        to_delete = 0;
+                                }
+                                else
+                                        sprintf(mail_buffer, "%s</table>\n<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        
+                                #ifdef DEBUG_MODE 
+                                printf("PRESSED KEY: %c\n", ch);
+                                #endif
+                        }
+                        printf("\n\n");
+                }
         }
         
         // sprintf(mail_buffer, "%s</table>\n<p>%d results %s DELETED from the %s DB.</p><br>", mail_buffer, to_delete, to_delete ? "" : "NOT", database); 
