@@ -3,7 +3,7 @@ from user_found_json import users_dict
 from user_ldap_found import users_ldap_dict
 from user_found_preserved_json import users_dict_preserved
 from user_ldap_preserved_found import users_ldap_preserved_dict
-from VPN_Zeus_20230515_mod import users_vpn_dict
+from VPN_Zeus_20230515_uname_mod import users_vpn_dict
 
 DEBUG_MODE=False #True
 
@@ -76,8 +76,8 @@ for i in users_dict:
             closing_date_raw = users_ldap_dict[uidnumber_str]
             closing_date = closing_date_raw[:4]+'-'+closing_date_raw[4:6]+'-'+closing_date_raw[6:8]
 
-    if(uidnumber_str in users_vpn_dict.keys()):
-        vpn_expiration_date = users_vpn_dict[uidnumber_str]
+    if(username in users_vpn_dict.keys()):
+        vpn_expiration_date = users_vpn_dict[username]
 
     if("krbPrincipalExpiration" not in i.keys()):
         krbPrincipalExpiration = None #''

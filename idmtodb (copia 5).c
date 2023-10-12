@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
         // email
         my_bool is_null_email;
         unsigned long p_email_length = 0;
-        char p_email[MAX_EMAIL_LEN];
+        char p_email[MAX_DIVISION_LEN];
         ps_insert_user_params[P_IN_EMAIL].buffer_type = MYSQL_TYPE_STRING; 
         ps_insert_user_params[P_IN_EMAIL].buffer = (char *) p_email; 
         ps_insert_user_params[P_IN_EMAIL].buffer_length = MAX_EMAIL_LEN;
