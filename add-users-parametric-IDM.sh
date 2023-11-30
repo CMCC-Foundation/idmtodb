@@ -252,4 +252,4 @@ for line in $(tail "$stage_file_loc" -n+2); do
 done
 
 # IDMTODB Consistency
-./idmtodb_launcher_ignore_groups.sh "$IDMTODB_PROMPT_ON_INSERT" "$IDMTODB_PROMPT_ON_UPDATE" "$IDMTODB_PROMPT_ON_DELETE" "$IDMTODB_IGNORE_GROUPS" "$IDMTODB_MAX_USERS" "$stage_file_loc"
+./idmtodb_launcher.sh "$IDMTODB_PROMPT_ON_INSERT" "$IDMTODB_PROMPT_ON_UPDATE" "$IDMTODB_PROMPT_ON_DELETE" "$IDMTODB_IGNORE_GROUPS" "$IDMTODB_MAX_USERS" "$stage_file_loc"
