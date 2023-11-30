@@ -1,27 +1,57 @@
-use idmdb_wip;
+use idmdb;
 
 DELIMITER ;; 
-DROP PROCEDURE IF EXISTS insert_user;
-CREATE PROCEDURE insert_user
+DROP PROCEDURE IF EXISTS insert_user_2;
+CREATE PROCEDURE insert_user_2
 ( 
-	 IN p_username VARCHAR(16),
+     IN p_username VARCHAR(16),
      IN p_name VARCHAR(32),
      IN p_surname VARCHAR(32),
      IN p_uid INT,
      IN p_gid INT,
-     IN p_group_name VARCHAR(32),
-     IN p_division VARCHAR(32),
+     IN p_group_names VARCHAR(320),
      IN p_creation_date DATE,
      IN p_expiration_date DATE,
      IN p_vpn_expiration_date DATE,
-     IN p_email VARCHAR(64)
+     IN p_email VARCHAR(64),
+     IN p_mach_user TINYINT
 )  
    BEGIN
    	DECLARE user_idm_lid INT;
-	INSERT INTO user_idm (username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email)
+	DECLARE group_type INT;
+	DECLARE strLen INT DEFAULT 0;
+  	DECLARE SubStrLen INT DEFAULT 0;
+        DECLARE group_name VARCHAR(32);   
+
+ 	INSERT INTO user_idm (username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email)
     VALUES (p_username, p_name, p_surname, p_uid, p_gid, p_creation_date, p_expiration_date, p_vpn_expiration_date, p_email);
     	SET user_idm_lid = LAST_INSERT_ID();
-    	INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, 0 FROM idmdb_wip.group WHERE name=p_division;	
-    	INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, 1 FROM idmdb_wip.group WHERE name=p_group_name;
+        SET group_type = !p_mach_user;
+
+    do_this:
+        LOOP
+	    SET strLen = CHAR_LENGTH(p_group_names);
+	    #INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, group_type FROM idmdb.group WHERE name=p_group_name #p_division;	
+
+	    SET group_name = SUBSTRING_INDEX(p_group_names, ',', 1);
+
+	    #IF EXISTS (SELECT * FROM idmdb.group WHERE name=group_name) THEN
+	        INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, group_type FROM idmdb.group WHERE name=group_name; #p_division;
+	    #END IF;
+
+	    SET SubStrLen = CHAR_LENGTH(SUBSTRING_INDEX(p_group_names, ',', 1)) +2;
+            SET p_group_names = MID(p_group_names, SubStrLen, strLen);
+	   
+
+    	    IF p_group_names = '' THEN
+	        LEAVE do_this;
+	    END IF;
+
+	    IF group_type < 2 THEN
+		SET group_type = group_type +1;
+	    END IF;
+
+    	END LOOP do_this;
+	#INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT user_idm_lid, idgroup, p_creation_date, 1 FROM idmdb.group WHERE name=p_group_name;
    END
    ;;
