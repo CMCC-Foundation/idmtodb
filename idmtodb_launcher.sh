@@ -18,14 +18,16 @@
 
 PROMPT_ON_INSERT=${1:-"1"}
 PROMPT_ON_UPDATE=${2:-"1"}
-MAX_USERS=${3:-"1000"}
-INPUT_FILE=${4:-"user_idm_$(date '+%Y-%m-%d').csv"} #"user_idm_02052023.csv"
-USERSIDM_SERVER=${5:-"127.0.0.1"}
-USERSIDM_USER=${6:-"root"}
-USERSIDM_PASSWORD="root"
-USERSIDM_DATABASE="users_idm"
+PROMPT_ON_DELETE=${3:-"2"} #${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
+IGNORE_GROUPS=${4:-"1"}
+MAX_USERS=${5:-"1000"}
+INPUT_FILE=${6:-"user_idm_20231012.csv"}
+USERSIDM_SERVER=${7:-"127.0.0.1"}
+USERSIDM_USER=${8:-"root"}
+USERSIDM_PASSWORD="root" #"root"
+USERSIDM_DATABASE="users_idm" #"idmdb_wip"
 MAIL_CMD="sendmail"
 MAIL_FROM="scc-noreply@cmcc.it"
 MAIL_TO="marco_chiarelli@yahoo.it"
 
-./idmtodb $PROMPT_ON_INSERT $PROMPT_ON_UPDATE $MAX_USERS "$INPUT_FILE" "$USERSIDM_SERVER" "$USERSIDM_USER" "$USERSIDM_PASSWORD" "$USERSIDM_DATABASE" "$MAIL_CMD" "$MAIL_FROM" "$MAIL_TO"
+./idmtodb $PROMPT_ON_INSERT $PROMPT_ON_UPDATE $PROMPT_ON_DELETE $IGNORE_GROUPS $MAX_USERS "$INPUT_FILE" "$USERSIDM_SERVER" "$USERSIDM_USER" "$USERSIDM_PASSWORD" "$USERSIDM_DATABASE" "$MAIL_CMD" "$MAIL_FROM" "$MAIL_TO"

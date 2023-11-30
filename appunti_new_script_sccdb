@@ -1,0 +1,34 @@
+######### VECCHI CAMPI #########
+# Campi dello script attuale, alcuni vengono ignorati
+# div (-f7) serve solo per creare la home, e sarebbe la divisione. (-f6 è group_name)
+# -f9 per ora è inutilizzato. Servirebbe per indicare se utente CMCC (0) oppure esterno (1)
+# -f11 anche è inutilizzato per ora. Serve per indicare lo stato dell'account, open (aperto), close (chiuso)
+# Esso viene sostituito dal campo closing_date, che serve per indicare la data di chiusura dell'utente.
+username=$(echo $line|cut -f1 -d";")
+# Not collecting encrypted password because we need cleartext password to create kerberos key
+uid=$(echo $line|cut -f2 -d";")
+gid=$(echo $line|cut -f3 -d";")
+first=$(echo $line|cut -f4 -d";")
+last=$(echo $line|cut -f5 -d";")
+div=$(echo $line|cut -f7 -d";")
+email=$(echo $line|cut -f8 -d";")
+tmp_expdate=$(echo $line|cut -f10 -d";")
+pwd=$(echo $line|cut -f12 -d";")
+
+
+######### NUOVI CAMPI #########
+username -f1
+first -f2
+last -f3
+uid -f4
+gid -f5
+group_name -f6
+div -f7
+creation_date -f8. Deve essere impostata alla keyword 'date'.
+expiration_date -f9
+vpn_expiration_date -f10
+mail -f11
+closing_date -f12
+0 NON viene considerato, non implementato
+# IDEA: Un utente esterno NON appartenendo al CMCC, apparterrà ad uno pseudo-gruppo UNIX, quindi non apparterrà formalmente ad una divisione del CMCC ma soltanto ad un gruppo (che può essere benissimo memorizzato nell'IDM). Quindi SOLO in questo caso, division sarà juno-ext e group_name questo gruppo (o viceversa). Quindi ora non lo mettiamo più nello script.
+pwd -f13

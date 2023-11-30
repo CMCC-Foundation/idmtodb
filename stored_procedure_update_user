@@ -1,4 +1,4 @@
-use users_idm;
+use idmdb_wip;
 
 DELIMITER ;; 
 DROP PROCEDURE IF EXISTS update_user;
@@ -8,17 +8,37 @@ CREATE PROCEDURE update_user
 	 IN p_username VARCHAR(16),
      IN p_name VARCHAR(32),
      IN p_surname VARCHAR(32),
-     IN p_uid INT(11),
-     IN p_gid INT(11),
+     IN p_uid INT,
+     IN p_gid INT,
      IN p_group_name VARCHAR(32),
      IN p_division VARCHAR(32),
      IN p_creation_date DATE,
      IN p_expiration_date DATE,
      IN p_vpn_expiration_date DATE,
-     IN p_email VARCHAR(64)
+     IN p_email VARCHAR(64),
+     IN p_closing_date DATE
 )  
    BEGIN  
-	UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, group_name = p_group_name, division = p_division, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email
+    DECLARE update_stmt_rc_division INT;
+    DECLARE update_stmt_rc_group_name INT;
+	UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email, closing_date = p_closing_date
     WHERE iduser_idm = p_iduser_idm;
+    	
+	UPDATE user_group_idm AS ug_idm_dst, (SELECT iduser_group_idm, idgroupExt FROM user_group_idm INNER JOIN idmdb_wip.group ON idgroupExt=idgroup WHERE iduserExt = p_iduser_idm AND idmdb_wip.group.name != p_division AND type = 0 AND dateTo IS NULL) AS ug_idm_src
+	SET
+		ug_idm_dst.dateTo = CURDATE()
+	WHERE ug_idm_dst.iduser_group_idm=ug_idm_src.iduser_group_idm;
+	SET update_stmt_rc_division = ROW_COUNT();
+	UPDATE user_group_idm AS ug_idm_dst, (SELECT iduser_group_idm, idgroupExt FROM user_group_idm INNER JOIN idmdb_wip.group ON idgroupExt=idgroup WHERE iduserExt = p_iduser_idm AND idmdb_wip.group.name != p_group_name AND type = 1 AND dateTo IS NULL) AS ug_idm_src
+	SET
+		ug_idm_dst.dateTo = CURDATE()
+	WHERE ug_idm_dst.iduser_group_idm=ug_idm_src.iduser_group_idm;
+	SET update_stmt_rc_group_name = ROW_COUNT();
+	IF(update_stmt_rc_division > 0) THEN
+        INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT p_iduser_idm, idgroup, CURDATE(), 0 FROM idmdb_wip.group WHERE name=p_division;
+    END IF;
+    IF(	update_stmt_rc_group_name > 0) THEN
+        INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT p_iduser_idm, idgroup, CURDATE(), 1 FROM idmdb_wip.group WHERE name=p_group_name;			
+    END IF;
    END
    ;;
