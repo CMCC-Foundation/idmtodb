@@ -5,6 +5,5 @@ idmdb_wip_*.sql
 VPN_*
 idmtodb
 idmtodb (copia).c
-idmtodb (seconda copia).c
-idmtodb (copia 3).c
-idmtodb (copia 4).c
+idmtodb (* copia).c
+idmtodb (copia *).c

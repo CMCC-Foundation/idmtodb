@@ -117,6 +117,8 @@ enum
 #define MAX_DATE_LEN 100
 #define MAX_EMAIL_LEN 64
 
+#define MAX_GROUPS 10 // according to the previous comment on MAX_GROUP_NAMES_LEN
+
 #define _MAX_NAME_LEN 16
 #define _MAX_SURNAME_LEN 16
 #define _MAX_GROUP_NAME_LEN 16
@@ -202,6 +204,134 @@ static void sendmail(const char * from_mail, const char * to_mail, const char * 
 	pclose(pp);
 	return;
 }
+ 
+// Defining comparator function as per the requirement 
+static int myCompare(const void* a, const void* b) 
+{ 
+    return strcmp(a, b); 
+} 
+
+static int are_groups_same(const char * group_names_a, const char * group_names_b)
+{
+	char group_names_a_array[MAX_GROUPS][MAX_GROUP_NAMES_LEN];
+	char group_names_b_array[MAX_GROUPS][MAX_GROUP_NAMES_LEN];
+
+	const char * pnt;
+	char * pnt_2;
+	int idx;
+	int len_a;
+	int len_b;
+
+	idx = 0;
+
+	#ifdef DEBUG_MODE
+	printf("before first for\n");
+	#endif
+
+	for(pnt = group_names_a, pnt_2=group_names_a_array[0]; *pnt != '\0'; ++ pnt)
+	{
+		#ifdef DEBUG_MODE
+		printf("pnt: %c\n", *pnt); // printf("pnt_2: %c\n", *pnt, *pnt_2);
+		#endif
+		if(*pnt == ',')
+		{
+			*pnt_2 = '\0';
+			#ifdef DEBUG_MODE
+			printf("pnt_2 after comma: %s\n", group_names_a_array[idx]);
+			#endif
+			pnt_2=group_names_a_array[++idx];
+			continue;
+		}
+
+		*pnt_2 = *pnt;
+		#ifdef DEBUG_MODE
+		printf("pnt_2: %c\n", *pnt_2);
+		#endif
+		++ pnt_2;
+	}	
+
+	*pnt_2 = '\0';
+	#ifdef DEBUG_MODE
+	printf("FINAL pnt_2: %s\n", group_names_a_array[idx]);
+	#endif
+	len_a = idx+1;
+	idx = 0;
+
+	for(pnt = group_names_b, pnt_2=group_names_b_array[0]; *pnt != '\0'; ++ pnt)
+        {
+
+                if(*pnt == ',')
+                {
+                        *pnt_2 = '\0';
+			#ifdef DEBUG_MODE
+			printf("pnt_2 after comma: %s\n", group_names_b_array[idx]);
+                        #endif
+			pnt_2=group_names_b_array[++idx];
+                        continue;
+                }
+
+                *pnt_2 = *pnt;
+		#ifdef DEBUG_MODE
+		printf("pnt_2: %c\n", *pnt_2);
+		#endif
+		++ pnt_2;
+        }
+
+        *pnt_2 = '\0';
+	#ifdef DEBUG_MODE
+	printf("FINAL pnt_2: %s\n", group_names_b_array[idx]);
+	#endif
+	len_b = idx+1;
+
+	int i, j;
+
+	if(len_a != len_b)
+	{
+		#ifdef DEBUG_MODE
+		printf("two group names different!\n");
+		#endif
+		return 0;
+	}
+
+	#ifdef DEBUG_MODE
+	printf("len_a: %d, len_b: %d\n\n", len_a, len_b);
+
+	for(i=0; i<len_a; ++i)
+        {
+                printf("group_names_a_array: %s\n", group_names_a_array[i]);
+                printf("group_names_b_array: %s\n", group_names_b_array[i]);
+	}
+
+	printf("before qsort: %d\n", sizeof(group_names_a_array[0]));
+	#endif
+
+	qsort(group_names_a_array, len_a, sizeof(group_names_a_array[0]), myCompare);
+	
+	#ifdef DEBUG_MODE
+	printf("after qsort: %d\n", sizeof(group_names_a_array[0]));
+	printf("before qsort: %d\n", sizeof(group_names_b_array[0]));
+	#endif
+	
+	qsort(group_names_b_array, len_b, sizeof(group_names_b_array[0]), myCompare);
+	
+	#ifdef DEBUG_MODE
+	printf("after qsort: %d\n", sizeof(group_names_b_array[0]));
+	#endif
+
+	for(i=0; i<len_a; ++i)
+	{
+		#ifdef DEBUG_MODE
+		printf("group_names_a_array: %s\n", group_names_a_array[i]);
+ 	       	printf("group_names_b_array: %s\n", group_names_b_array[i]);
+		#endif
+		
+		if(strcmp(group_names_a_array[i], group_names_b_array[i]))
+			return 0;
+	}
+
+
+	return 1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -230,7 +360,11 @@ int main(int argc, char *argv[])
 
         printf("prompt_on_insert: %u\nprompt_on_update: %u\nprompt_on_delete: %u\nignore_groups: %u\nmax_users: %d\ninput_file: %s\nserver: %s\nuser: %s\npassword: %s\ndatabase: %s\nmail_cmd: %s\nfrom_mail: %s\nto_mail: %s\n",
                 prompt_on_insert, prompt_on_update, prompt_on_delete, ignore_groups, max_users, input_file, server, user, psw_asterisks, database, mail_cmd, from_mail, to_mail);
-        // exit(0);
+        
+	
+	printf("are_groups_same: %d\n", are_groups_same("sysm,amm,sap,xss", "asc,sysm,sysm,opa"));
+	
+	// exit(0);
         #endif
 
         char mail_cmd_to[MAX_MAILCMDTO_LEN];
@@ -877,7 +1011,7 @@ int main(int argc, char *argv[])
 				//#endif
 
                                 if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->username, pnt_user_db->username) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)||
-                                   ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
+                                   ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
                                    strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email)))
 				{
