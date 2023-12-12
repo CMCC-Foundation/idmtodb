@@ -31,9 +31,11 @@
 // #define DEBUG_MODE
 #define INSERT_USER "CALL insert_user_2(?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_USER "CALL update_user_2(?,?,?,?,?,?,?,?,?,?,?,?,?)"
+#define UPDATE_USER_IGNORE_DIVISION_GROUP_NAME "CALL update_user_ignore_division_group_name(?,?,?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_PRES_USER "CALL update_pres_user(?,?)"
 #define DELETE_USER "CALL delete_user(?)"
 #define SELECT_ALL_USERS "CALL select_all_users_2( )"
+#define SELECT_ALL_USERS_IGNORE_DIVISION_GROUP_NAME "CALL select_all_users_ignore_division_group_name( )"
 
 // typedef bool my_bool;
 
@@ -92,6 +94,7 @@ enum
 #define	CSV_SEPARATOR ';'
 
 #define DEFAULT_IGNORE_GROUPS 1
+#define DEFAULT_IGNORE_DIVISION_GROUP_NAME 1
 
 #define DEFAULT_MAIL_COMMAND "sendmail"
 #define DEFAULT_FROM_MAIL "idmtodb"
@@ -339,15 +342,16 @@ int main(int argc, char *argv[])
         const unsigned char prompt_on_update = argc > 2 ? atoi(argv[2]): DEFAULT_PROMPT_ON_UPDATE;
         const unsigned char prompt_on_delete = argc > 3 ? atoi(argv[3]): DEFAULT_PROMPT_ON_DELETE;
 	const unsigned char ignore_groups = argc > 4 ? atoi(argv[4]) : DEFAULT_IGNORE_GROUPS;
-        const int max_users = argc > 5 ? atoi(argv[5]) : MAX_USERS;
-        const char * input_file = argc > 6? argv[6] : DEFAULT_INPUT_FILE;
-        const char * server = argc > 7 ? argv[7] : USERSIDM_SERVER;
-        const char * user = argc > 8 ? argv[8] : USERSIDM_USER;
-        const char * password = argc > 9 ? argv[9] : USERSIDM_PASSWORD;
-        const char * database = argc > 10 ? argv[10] : USERSIDM_DATABASE;
-        const char * mail_cmd = argc > 11 ? argv[11] : DEFAULT_MAIL_COMMAND;
-        const char * from_mail = argc > 12 ? argv[12] : DEFAULT_FROM_MAIL;
-        const char * to_mail = argc > 13 ? argv[13] : NULL;
+        const unsigned char ignore_division_group_name = argc > 5 ? atoi(argv[5]) : DEFAULT_IGNORE_DIVISION_GROUP_NAME;
+	const int max_users = argc > 6 ? atoi(argv[6]) : MAX_USERS;
+        const char * input_file = argc > 7 ? argv[7] : DEFAULT_INPUT_FILE;
+        const char * server = argc > 8 ? argv[8] : USERSIDM_SERVER;
+        const char * user = argc > 9 ? argv[9] : USERSIDM_USER;
+        const char * password = argc > 10 ? argv[10] : USERSIDM_PASSWORD;
+        const char * database = argc > 11 ? argv[11] : USERSIDM_DATABASE;
+        const char * mail_cmd = argc > 12 ? argv[12] : DEFAULT_MAIL_COMMAND;
+        const char * from_mail = argc > 13 ? argv[13] : DEFAULT_FROM_MAIL;
+        const char * to_mail = argc > 14 ? argv[14] : NULL;
 
         // char * token;
 
@@ -362,9 +366,9 @@ int main(int argc, char *argv[])
                 prompt_on_insert, prompt_on_update, prompt_on_delete, ignore_groups, max_users, input_file, server, user, psw_asterisks, database, mail_cmd, from_mail, to_mail);
         
 	
-	printf("are_groups_same: %d\n", are_groups_same("sysm,amm,sap,xss", "asc,sysm,sysm,opa"));
+	printf("are_groups_same: %d\n", are_groups_same("sysm,amm,xss,zap,sap", "asc,sysm,sysm,opa,abc"));
 	
-	// exit(0);
+	exit(0);
         #endif
 
         char mail_cmd_to[MAX_MAILCMDTO_LEN];
@@ -468,7 +472,8 @@ int main(int argc, char *argv[])
         printf("\nstatus of insert_stmt prepare: %d\n", status);
         #endif
 
-        status = mysql_stmt_prepare(update_stmt, UPDATE_USER, strlen(UPDATE_USER));
+        status = ignore_division_group_name ? mysql_stmt_prepare(update_stmt, UPDATE_USER_IGNORE_DIVISION_GROUP_NAME, strlen(UPDATE_USER_IGNORE_DIVISION_GROUP_NAME)) :
+						mysql_stmt_prepare(update_stmt, UPDATE_USER, strlen(UPDATE_USER));
         
         #ifdef DEBUG_MODE
         printf("\nstatus of update_stmt prepare: %d\n", status);
@@ -486,8 +491,10 @@ int main(int argc, char *argv[])
         printf("\nstatus of delete_stmt prepare: %d\n", status);
         #endif
         
-        status = mysql_stmt_prepare(select_stmt, SELECT_ALL_USERS, strlen(SELECT_ALL_USERS));
+        status = ignore_division_group_name ? mysql_stmt_prepare(select_stmt, SELECT_ALL_USERS_IGNORE_DIVISION_GROUP_NAME, strlen(SELECT_ALL_USERS_IGNORE_DIVISION_GROUP_NAME)) :
+						mysql_stmt_prepare(select_stmt, SELECT_ALL_USERS, strlen(SELECT_ALL_USERS));
         
+
         #ifdef DEBUG_MODE
         printf("\nstatus of select_stmt prepare: %d\n", status);
         printf("After mysql_stmt_prepare and before memset\n");
@@ -989,7 +996,7 @@ int main(int argc, char *argv[])
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 					printf("gid differs\n");
 
-				if((!ignore_groups) && strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 					printf("group_names differs\n");			
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))

@@ -1,8 +1,8 @@
 use idmdb;
 
 DELIMITER ;; 
-DROP PROCEDURE IF EXISTS update_user_ignore_division_group_name;
-CREATE PROCEDURE update_user_ignore_division_group_name
+DROP PROCEDURE IF EXISTS update_user_2;
+CREATE PROCEDURE update_user_2
 ( 
 	 IN p_iduser_idm INT,
 	 IN p_username VARCHAR(16),
@@ -20,30 +20,30 @@ CREATE PROCEDURE update_user_ignore_division_group_name
 )  
    BEGIN  
     DECLARE update_stmt_rc INT;
-    DECLARE group_type INT;
     DECLARE strLen INT DEFAULT 0;
     DECLARE SubStrLen INT DEFAULT 0;
     DECLARE group_name VARCHAR(32);
-	
+
+   
     UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email, closing_date = p_closing_date
     WHERE iduser_idm = p_iduser_idm;
-    	
-    # exclude FIND_IN_SET from the WHERE clause
-    #UPDATE user_group_idm AS ug_idm_dst, (SELECT iduser_group_idm, idgroupExt FROM user_group_idm INNER JOIN idmdb.group ON idgroupExt=idgroup WHERE iduserExt = p_iduser_idm AND (type = 0 OR type = 1) AND dateTo IS NULL) AS ug_idm_src
-    #SET
-    #	ug_idm_dst.dateTo = CURDATE()
-    #WHERE ug_idm_dst.iduser_group_idm=ug_idm_src.iduser_group_idm;
-    #SET update_stmt_rc = ROW_COUNT();
-	 
+
     DELETE FROM user_group_idm WHERE iduserExt = p_iduser_idm AND type = 2;
+
+    #UPDATE user_group_idm AS ug_idm_dst, (SELECT iduser_group_idm, idgroupExt, name FROM user_group_idm INNER JOIN idmdb.group ON idgroupExt=idgroup WHERE iduserExt = p_iduser_idm AND (type = 0 OR type = 1) AND FIND_IN_SET(name,p_group_names) = 0 AND dateTo IS NULL) AS ug_idm_src
+    #SET
+    #	    ug_idm_dst.dateTo = CURDATE()
+    #WHERE ug_idm_dst.iduser_group_idm=ug_idm_src.iduser_group_idm;
+   
+    SET update_stmt_rc = ROW_COUNT();
 
     do_this:
         LOOP
 	    SET strLen = CHAR_LENGTH(p_group_names);
 	    SET group_name = SUBSTRING_INDEX(p_group_names, ',', 1);
 
-	    INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT p_iduser_idm, idgroup, CURDATE(), 2 FROM idmdb.group WHERE name=group_name;
-	    
+            INSERT INTO user_group_idm (iduserExt, idgroupExt, dateFrom, type) SELECT p_iduser_idm, idgroup, CURDATE(), 2 FROM idmdb.group WHERE name=group_name;
+
             SET SubStrLen = CHAR_LENGTH(SUBSTRING_INDEX(p_group_names, ',', 1)) +2;
             SET p_group_names = MID(p_group_names, SubStrLen, strLen);
 	   
@@ -52,7 +52,8 @@ CREATE PROCEDURE update_user_ignore_division_group_name
                 LEAVE do_this;
             END IF;
 
-        END LOOP do_this;
 
+        END LOOP do_this;
+  
    END
    ;;
