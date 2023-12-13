@@ -1,9 +1,10 @@
 import sys
+from group_found_json import groups_dict
 from user_found_json import users_dict
 from user_ldap_found import users_ldap_dict
-from user_found_preserved_json import users_dict_preserved
-from user_ldap_preserved_found import users_ldap_preserved_dict
-from VPN_Zeus_20230515_mod import users_vpn_dict
+#from user_found_preserved_json import users_dict_preserved
+#from user_ldap_preserved_found import users_ldap_preserved_dict
+from VPN_expiration_date_mod import users_vpn_dict
 
 DEBUG_MODE=False #True
 
@@ -15,8 +16,14 @@ jolly_groups=["ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
 print("username,name,surname,uid,gid,group_name,division,creation_date,expiration_date,vpn_expiration_date,email,closing_date") #,no_cmcc,closing_date,status")I
 
-users_dict.extend(users_dict_preserved)
-users_ldap_dict.update(users_ldap_preserved_dict)
+#users_dict.extend(users_dict_preserved)
+#users_ldap_dict.update(users_ldap_preserved_dict)
+
+groups_mapping = dict( )
+
+for i in groups_dict:
+    if("gidnumber" in i.keys()):
+        groups_mapping[i["gidnumber"][0]] = i["cn"][0]
 
 for i in users_dict:
     username=i["uid"][0]
@@ -29,9 +36,12 @@ for i in users_dict:
     #print("---")
 
     #if("memberOf" in i.keys()):
+    groups_mapping_keys = groups_mapping.keys()
     memberOf = i["memberOf"] if("memberOf" in i.keys()) else None
+    orderedMemberOf = []
     is_preserved = (memberOf is None)
 
+    mach = ''
     group = None
     division = None
     creation_date = None
@@ -40,7 +50,9 @@ for i in users_dict:
     vpn_expiration_date = None
     uidnumber_str = i["uidnumber"][0]
     uidnumber = int(uidnumber_str)
-
+    gidnumber_str = i["gidnumber"][0]
+    gidnumber = int(gidnumber_str)
+    password = "password"
 
     if(not is_preserved):
         for j in memberOf:
@@ -49,16 +61,23 @@ for i in users_dict:
 
             if(first_group_token[0] != "ipaUniqueID"):
                 this_group = first_group_token[1]
+                splitted_this_group = this_group.split("-")
                 #print(this_group)
-        
-                if(this_group in divisions):
+            
+                if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
+                    mach = splitted_this_group[0]
+                elif(this_group in divisions):
                     division = this_group
-                elif(this_group not in jolly_groups):
+                elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
                     group = this_group
+                else:
+                    orderedMemberOf.append(this_group)
 
 
         if(group == None and division != None):
             group = division
+
+        orderedMemberOf = [division] + [group] + orderedMemberOf
 
 
     '''
@@ -76,8 +95,8 @@ for i in users_dict:
             closing_date_raw = users_ldap_dict[uidnumber_str]
             closing_date = closing_date_raw[:4]+'-'+closing_date_raw[4:6]+'-'+closing_date_raw[6:8]
 
-    if(uidnumber_str in users_vpn_dict.keys()):
-        vpn_expiration_date = users_vpn_dict[uidnumber_str]
+    if(username in users_vpn_dict.keys()):
+        vpn_expiration_date = users_vpn_dict[username]
 
     if("krbPrincipalExpiration" not in i.keys()):
         krbPrincipalExpiration = None #''
@@ -109,7 +128,7 @@ for i in users_dict:
         print("memberOf: {}".format(memberOf))
         #print("---")
 
-    print("{},{},{},{},{},{},{},{},{},{},{},{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, int(i["gidnumber"][0]), group, division, creation_date, krbPrincipalExpiration, vpn_expiration_date, i["mail"][0], closing_date)) 
+    print("{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, i["mail"][0], closing_date, password, mach)) 
     cnt += 1
 
 if(DEBUG_MODE):
