@@ -9,5 +9,5 @@ echo 'users_ldap_dict={' > user_ldap_found.py && ldapsearch  "(memberOf=cn=juno-
 mysql idmdb --raw -h 172.16.3.23 -u sysm01 -p960coreP6 < vpn_query > VPN_expiration_date.csv
 #echo 'users_vpn_dict={' > "VPN_Zeus_""$sel_date""_mod.py" && cat "VPN_Zeus_""$sel_date"".csv" | tr ',' ':' | sed ':a;N;$!ba;s/\n/",\n"/g' | sed 's/""//g' | tail -n +2 | head -n -1 | sed 's/:/":"/g' | sed ':a;N;$!ba;s/.$/\n}/g' >> VPN_Zeus_"$sel_date"_mod.py
 echo 'users_vpn_dict={' > "VPN_expiration_date_mod.py" && cat "VPN_expiration_date.csv" | sed "s/	/:/g" | sed ':a;N;$!ba;s/\n/",\n"/g' | sed 's/""//g' | tail -n +2 | head -n -1 | sed 's/:/":"/g' | sed ':a;N;$!ba;s/.$/\n}/g' >> VPN_expiration_date_mod.py
-python3 sanitize_krbprincipalexpiration_unified.py > "user_idm_""$sel_date"".csv" # eventually you may want to redirect 2>/dev/null
+python3 fetch_users.py > "user_idm_""$sel_date"".csv" # eventually you may want to redirect 2>/dev/null
 python3 fetch_groups.py > "group_idm_""$sel_date"".csv"
