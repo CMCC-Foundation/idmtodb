@@ -1,0 +1,13 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS accounts_overview;
+CREATE PROCEDURE accounts_overview
+( 
+	IN p_lower_date DATE,
+	IN p_upper_date DATE
+)  
+   BEGIN  
+	WITH tmp AS (SELECT division, SUM((surname='project account')) AS how_many_op, COUNT(*) AS cnt FROM user_gd_idm WHERE creation_date >= p_lower_date AND creation_date <= p_upper_date GROUP by division) SELECT division, how_many_op, (cnt-how_many_op) AS how_many_personal, cnt FROM tmp;
+   END
+   ;;

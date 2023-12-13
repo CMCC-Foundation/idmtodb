@@ -1,0 +1,15 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS insert_group;
+CREATE PROCEDURE insert_group
+(  
+     IN p_name VARCHAR(32),
+     IN p_desc VARCHAR(512),
+     IN p_status TINYINT,
+     IN p_gid INT
+)  
+   BEGIN
+	INSERT INTO idmdb.group (name, idmdb.group.desc, status, gid) VALUES (p_name, p_desc, p_status, p_gid);
+   END
+   ;;

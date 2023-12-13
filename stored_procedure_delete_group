@@ -1,0 +1,13 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS delete_group;
+CREATE PROCEDURE delete_group
+( 
+	IN p_group_idm INT
+)  
+   BEGIN
+   	DELETE FROM user_group_idm WHERE idgroupExt = p_group_idm; 
+   	DELETE FROM idmdb.group WHERE idgroup = p_group_idm;
+   END
+   ;;

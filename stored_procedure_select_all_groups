@@ -1,0 +1,11 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS select_all_groups;
+CREATE PROCEDURE select_all_groups
+( 
+)  
+   BEGIN  
+	SELECT idgroup, name, idmdb.group.desc, status, gid FROM idmdb.group;
+   END
+   ;;

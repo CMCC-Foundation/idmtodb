@@ -109,6 +109,8 @@ enum
 
 #define DEFAULT_INPUT_FILE "user_idm.csv"
 
+#define MAX_BUFTIME_LENGTH 160
+
 #define MAX_PASSWORD_LEN 512
 
 #define MAX_USERNAME_LEN 16
@@ -168,6 +170,23 @@ typedef struct _id_idm_user_t
         idm_user_t idm_user;
 } id_idm_user_t;
 */
+
+static inline const char * gettime(time_t * aux_time)
+{
+	static char buftime[MAX_BUFTIME_LENGTH];
+        static time_t logging_timestamp;
+        static struct tm ts;
+
+	logging_timestamp = time(NULL);
+
+	if(aux_time)
+		*aux_time = logging_timestamp;
+
+        ts = *localtime(&logging_timestamp);
+        strftime(buftime, sizeof(buftime), "%Y-%m-%d-%H:%M:%S", &ts);
+	return buftime;
+}
+
 
 static void sendmail(const char * from_mail, const char * to_mail, const char * mail_cmd, const char * message)
 {
@@ -908,7 +927,8 @@ int main(int argc, char *argv[])
 	}
         
         fclose(fp);
-        printf("Total line num: %d\n", line_num);
+        
+	printf("[%s] Total line num: %d\n", gettime(NULL), line_num);
         
         int i, j;
         int rows;
@@ -951,7 +971,7 @@ int main(int argc, char *argv[])
         printf("mysql_stmt_fetch: %d\n", result);
         #endif
         
-        printf("Total rows num: %d\n", rows);
+        printf("[%s] Total rows num: %d\n", gettime(NULL), rows);
         
         idm_user_t * pnt_user_db = NULL;
         
@@ -961,7 +981,8 @@ int main(int argc, char *argv[])
         */
         
         // COMPARISON CODE
-        printf("line_num: %d\n\n", line_num);
+        
+	printf("[%s] line_num: %d\n\n", gettime(NULL), line_num);
         
         for(i=0; i<line_num; ++i)
         {
@@ -970,12 +991,12 @@ int main(int argc, char *argv[])
                 {
                         pnt_user_db = &users_db[j];
                         // printf("idm_uid: %d, db_uid: %d\n", pnt_user->uid, pnt_user_db->uid);
-                        if(pnt_user->uid == pnt_user_db->uid)
+                        if(!strcmp(pnt_user->username, pnt_user_db->username)) // pnt_user->uid == pnt_user_db->uid)
                         {
                                 
 				// printf("username: %s\n", pnt_user->username);
                                 //#ifdef DEBUG_MODE
-                                printf("Hallelujah\n");
+                                //printf("Hallelujah\n");
 				//#endif
 				
 				//#ifdef DEBUG_MODE
@@ -984,14 +1005,19 @@ int main(int argc, char *argv[])
 				if(strcmp(pnt_user->closing_date, pnt_user_db->closing_date))
 					printf("closing_date differs\n");
 
+				/*
 				if(strcmp(pnt_user->username, pnt_user_db->username))
 					printf("username differs\n");
+				*/
 
 				if(strcmp(pnt_user->name, pnt_user_db->name))
 					printf("name differs\n");
 
 				if(strcmp(pnt_user->surname, pnt_user_db->surname))
                                         printf("surname differs\n");
+
+				if(pnt_user->uid != pnt_user_db->uid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
+                                        printf("uid differs\n");
 
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 					printf("gid differs\n");
@@ -1017,8 +1043,7 @@ int main(int argc, char *argv[])
 
 				//#endif
 
-                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->username, pnt_user_db->username) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)||
-                                   ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
+                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
                                    strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email)))
 				{
@@ -1052,7 +1077,7 @@ int main(int argc, char *argv[])
                 for(i=0; i<line_num; ++i)
                 {
                         pnt_user = &users[i];
-                        if(pnt_user->uid == pnt_user_db->uid)
+                        if(!strcmp(pnt_user->username, pnt_user_db->username)) // pnt_user->uid == pnt_user_db->uid)
                                 break;
                 }
                 
@@ -1077,7 +1102,7 @@ int main(int argc, char *argv[])
         
         // char mail_format_buf[_MAX_MAIL_LEN];
         
-        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s| closing_date%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 5, 5, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding);
+        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s| closing_date%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAMES_LEN, _MAX_GROUP_NAMES_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
          
 
@@ -1569,9 +1594,9 @@ int main(int argc, char *argv[])
                 if(inserted || updated)
                 {
                     if(inserted)
-                        printf("%d records have been successfully INSERTED into the %s DB.\n\n", to_insert, database);
+                        printf("[%s] %d records have been successfully INSERTED into the %s DB.\n\n", gettime(NULL), to_insert, database);
                     if(updated)
-                        printf("%d records have been successfully UPDATED into the %s DB.\n\n", to_update, database);
+                        printf("[%s] %d records have been successfully UPDATED into the %s DB.\n\n", gettime(NULL), to_update, database);
                         
                     /*
                     if(is_mail_active)
@@ -1600,7 +1625,7 @@ int main(int argc, char *argv[])
                         }
                 }
                 
-                printf("%d records have been successfully DELETED from the %s DB.\n\n", to_delete, database);
+                printf("[%s] %d records have been successfully DELETED from the %s DB.\n\n", gettime(NULL), to_delete, database);
                 
         }
         

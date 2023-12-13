@@ -1,8 +1,8 @@
 use idmdb;
 
 DELIMITER ;; 
-DROP PROCEDURE IF EXISTS update_user_2;
-CREATE PROCEDURE update_user_2
+DROP PROCEDURE IF EXISTS update_user_ignore_division_group_name;
+CREATE PROCEDURE update_user_ignore_division_group_name
 ( 
 	 IN p_iduser_idm INT,
 	 IN p_username VARCHAR(16),

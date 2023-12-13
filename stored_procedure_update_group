@@ -1,0 +1,16 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS update_group;
+CREATE PROCEDURE update_group
+(  
+     IN p_idgroup_idm INT,
+     IN p_name VARCHAR(32),
+     IN p_desc VARCHAR(512),
+     IN p_status TINYINT,
+     IN p_gid INT
+)  
+   BEGIN
+	UPDATE idmdb.group SET name = p_name, idmdb.group.desc = p_desc, status = p_status, gid = p_gid WHERE idgroup = p_idgroup_idm; 
+   END
+   ;;
