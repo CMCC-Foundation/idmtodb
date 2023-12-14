@@ -656,20 +656,22 @@ int main(int argc, char *argv[])
         ps_update_user_params[P_INOUT_GROUPNAMES].is_null = 0;
         ps_update_user_params[P_INOUT_GROUPNAMES].length = &p_group_names_length;
         
-        // creation_date
-        unsigned long p_creation_date_length = 0;
+
+	// creation_date
+        my_bool is_null_creation_date;
+	unsigned long p_creation_date_length = 0;
         char p_creation_date[MAX_DATE_LEN];
         ps_insert_user_params[P_IN_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
         ps_insert_user_params[P_IN_CREATION_DATE].buffer = (char *) p_creation_date;
         ps_insert_user_params[P_IN_CREATION_DATE].buffer_length = MAX_DATE_LEN;
         ps_insert_user_params[P_IN_CREATION_DATE].length = &p_creation_date_length;
-        ps_insert_user_params[P_IN_CREATION_DATE].is_null = 0;
+        ps_insert_user_params[P_IN_CREATION_DATE].is_null = &is_null_creation_date;
         
         ps_update_user_params[P_INOUT_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
         ps_update_user_params[P_INOUT_CREATION_DATE].buffer = (char *) p_creation_date;
         ps_update_user_params[P_INOUT_CREATION_DATE].buffer_length = MAX_DATE_LEN;
         ps_update_user_params[P_INOUT_CREATION_DATE].length = &p_creation_date_length;
-        ps_update_user_params[P_INOUT_CREATION_DATE].is_null = 0;
+        ps_update_user_params[P_INOUT_CREATION_DATE].is_null = &is_null_creation_date;
 
         // expiration_date
         my_bool is_null_expiration_date;
@@ -952,7 +954,7 @@ int main(int argc, char *argv[])
                 pnt_user->gid = p_gid;
                 strcpy(pnt_user->group_names, p_group_names);
                 // strcpy(pnt_user->division, p_division);
-                strcpy(pnt_user->creation_date, p_creation_date);
+                strcpy(pnt_user->creation_date, is_null_creation_date ? NULL_IDENTIFIER : p_creation_date);
                 strcpy(pnt_user->expiration_date, is_null_expiration_date ? NULL_IDENTIFIER : p_expiration_date);
                 strcpy(pnt_user->vpn_expiration_date, is_null_vpn_expiration_date ? NULL_IDENTIFIER : p_vpn_expiration_date);
                 strcpy(pnt_user->email, is_null_email ? NULL_IDENTIFIER : p_email);
@@ -1472,11 +1474,6 @@ int main(int argc, char *argv[])
                                 #endif
                                 strcpy(p_group_names, pnt_user->group_names);
                                 p_group_names_length = strlen(p_group_names);
-                                #ifdef DEBUG_MODE
-                                printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
-                                #endif
-                                strcpy(p_creation_date, pnt_user->creation_date);
-                                p_creation_date_length = strlen(p_creation_date);
 
 				#ifdef DEBUG_MODE
 				printf("pnt_user->is_mach_user: %s\n", pnt_user->is_mach_user);
@@ -1484,7 +1481,27 @@ int main(int argc, char *argv[])
 
 				p_is_mach_user = pnt_user->is_mach_user;
                                 
-                                if(strcmp(pnt_user->expiration_date, NULL_IDENTIFIER))
+				if(pnt_user->creation_date && strcmp(pnt_user->creation_date, NULL_IDENTIFIER) && strlen(pnt_user->creation_date))
+                                {
+
+                                        is_null_creation_date = 0;
+                                        #ifdef DEBUG_MODE
+                                        printf("creation_date not null\n");
+                                        printf("pnt_user->creation_date: %s\n", pnt_user->creation_date);
+                                        #endif
+                                        strcpy(p_creation_date, pnt_user->creation_date);
+                                        p_creation_date_length = strlen(p_creation_date);
+                                }
+                                else
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("creation_date null\n");
+                                        #endif
+                                        is_null_creation_date = 1;
+                                        p_creation_date_length = 0;
+                                }
+
+                                if(pnt_user->expiration_date && strcmp(pnt_user->expiration_date, NULL_IDENTIFIER) && strlen(pnt_user->expiration_date))
                                 {
                                         
                                         is_null_expiration_date = 0;
@@ -1504,7 +1521,7 @@ int main(int argc, char *argv[])
                                         p_expiration_date_length = 0;
                                 }
                                 
-                                if(strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER))
+                                if(pnt_user->vpn_expiration_date && strcmp(pnt_user->vpn_expiration_date, NULL_IDENTIFIER) && strlen(pnt_user->vpn_expiration_date))
                                 {
                                         is_null_vpn_expiration_date = 0;
                                         #ifdef DEBUG_MODE
@@ -1541,7 +1558,7 @@ int main(int argc, char *argv[])
                                         is_null_email = 1;
                                         p_email_length = 0;
                                 }
-                                
+                               
                                 if(strcmp(pnt_user->closing_date, NULL_IDENTIFIER))
                                 {
                                         
