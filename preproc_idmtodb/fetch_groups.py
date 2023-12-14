@@ -3,7 +3,7 @@ from group_found_json import groups_dict
 DEBUG_MODE=False #True
 
 
-jolly_groups=["ipausers", "juno-users", "juno-cmcc", "juno-ext"]
+jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
 print("name,description,gid") #,no_cmcc,closing_date,status")I
 
