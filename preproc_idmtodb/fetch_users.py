@@ -7,6 +7,7 @@ from user_ldap_found import users_ldap_dict
 from VPN_expiration_date_mod import users_vpn_dict
 
 DEBUG_MODE=False #True
+DIVISION_GROUP_STR="This is a division group"
 
 #print("users_dict len: {}".format(len(users_dict)))
 cnt=0
@@ -20,10 +21,12 @@ print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,v
 #users_ldap_dict.update(users_ldap_preserved_dict)
 
 groups_mapping = dict( )
+groups_desc = dict( )
 
 for i in groups_dict:
     if("gidnumber" in i.keys()):
         groups_mapping[i["gidnumber"][0]] = i["cn"][0]
+        groups_desc[i["gidnumber"][0]] = i["description"][0]
 
 for i in users_dict:
     username=i["uid"][0]
@@ -66,7 +69,7 @@ for i in users_dict:
             
                 if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
                     mach = splitted_this_group[0]
-                elif(this_group in divisions):
+                elif(this_group in divisions or (gidnumber_str in groups_mapping_keys and DIVISION_GROUP_STR in groups_desc[gidnumber_str])):
                     division = this_group
                 elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
                     group = this_group

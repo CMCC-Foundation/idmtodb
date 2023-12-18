@@ -22,7 +22,7 @@ for i in groups_dict:
     this_group_key = i.keys()
 
     group_name = i["cn"][0]
-    description = i["description"][0].replace(',','') if "description" in this_group_key else None 
+    description = i["description"][0].replace(',','').replace(';','') if "description" in this_group_key else None 
 
     gidnumber = i["gidnumber"][0] if "gidnumber" in this_group_key else None
   
