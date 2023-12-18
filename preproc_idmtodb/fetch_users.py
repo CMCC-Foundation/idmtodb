@@ -24,9 +24,19 @@ groups_mapping = dict( )
 groups_desc = dict( )
 
 for i in groups_dict:
-    if("gidnumber" in i.keys()):
+    i_keys=i.keys()
+    groups_desc[i["cn"][0]] = i["description"][0] if "description" in i_keys else '' #None
+    if("gidnumber" in i_keys):
         groups_mapping[i["gidnumber"][0]] = i["cn"][0]
-        groups_desc[i["gidnumber"][0]] = i["description"][0]
+        #groups_desc[i["gidnumber"][0]] = i["description"][0] if "description" in i_keys else '' #None
+
+
+#print("groups desc")
+#print(groups_desc)
+#print("---")
+
+groups_mapping_keys = groups_mapping.keys()
+groups_desc_keys = groups_desc.keys()
 
 for i in users_dict:
     username=i["uid"][0]
@@ -39,7 +49,7 @@ for i in users_dict:
     #print("---")
 
     #if("memberOf" in i.keys()):
-    groups_mapping_keys = groups_mapping.keys()
+    #groups_mapping_keys = groups_mapping.keys()
     memberOf = i["memberOf"] if("memberOf" in i.keys()) else None
     orderedMemberOf = []
     is_preserved = (memberOf is None)
@@ -69,8 +79,8 @@ for i in users_dict:
             
                 if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
                     mach = splitted_this_group[0]
-                elif(this_group in divisions or (gidnumber_str in groups_mapping_keys and DIVISION_GROUP_STR in groups_desc[gidnumber_str])):
-                    division = this_group
+                elif(this_group in divisions or (this_group in groups_desc_keys and DIVISION_GROUP_STR in groups_desc[this_group])):
+                    division = this_group 
                 elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
                     group = this_group
                 else:
