@@ -1024,7 +1024,7 @@ int main(int argc, char *argv[])
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 					printf("gid differs\n");
 
-				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 					printf("group_names differs\n");			
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))
@@ -1045,7 +1045,7 @@ int main(int argc, char *argv[])
 
 				//#endif
 
-                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
+                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
                                    strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email)))
 				{
@@ -1107,6 +1107,7 @@ int main(int argc, char *argv[])
         sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s| closing_date%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAMES_LEN, _MAX_GROUP_NAMES_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
          
+	strcpy(mail_buffer, "");
 
         for(i=0; i<line_num; ++i)
         {
@@ -1182,7 +1183,8 @@ int main(int argc, char *argv[])
         
         if(to_insert)
         {
-                printf("\n\nThe following %d records have to be INSERTED into the %s DB. ", to_insert, database);
+                sprintf(mail_buffer, "%s</table>\n", mail_buffer);
+		printf("\n\nThe following %d records have to be INSERTED into the %s DB. ", to_insert, database);
                 
                 if(prompt_on_insert)
                 {
@@ -1197,16 +1199,19 @@ int main(int argc, char *argv[])
                         
                         if((ch = getchar()) == 'n')
                         {
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results NOT INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+                                sprintf(mail_buffer, "%s<p>%d results NOT INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
                                 to_insert = 0;
                         }
                         else
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+                                sprintf(mail_buffer, "%s<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
                                        
                         #ifdef DEBUG_MODE 
                         printf("PRESSED KEY: %c\n", ch);
                         #endif
                 }
+		else
+			sprintf(mail_buffer, "%s<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+
                 printf("\n\n");
         }
         
@@ -1287,6 +1292,7 @@ int main(int argc, char *argv[])
         
         if(to_update)
         {
+		sprintf(mail_buffer, "%s</table>\n", mail_buffer);
                 printf("\n\nThe following %d records have to be UPDATED into the %s DB. ", to_update, database);
                 
                 if(prompt_on_update)
@@ -1304,16 +1310,19 @@ int main(int argc, char *argv[])
                         
                         if((ch = getchar()) == 'n')
                         {
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results NOT UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
+                                sprintf(mail_buffer, "%s<p>%d results NOT UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
                                 to_update = 0;
                         }
                         else
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
+                                sprintf(mail_buffer, "%s<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
                                 
                         #ifdef DEBUG_MODE 
                         printf("PRESSED KEY: %c\n", ch);
                         #endif
                 }
+		else
+			sprintf(mail_buffer, "%s<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database);
+
                 printf("\n\n");
         }
         
@@ -1390,6 +1399,7 @@ int main(int argc, char *argv[])
                 
                 if(to_delete)
                 {
+			sprintf(mail_buffer, "%s</table>\n", mail_buffer);
                         printf("\n\nThe following %d records have to be DELETED from the %s DB. ", to_delete, database);
                         
                         if(prompt_on_delete)
@@ -1405,16 +1415,19 @@ int main(int argc, char *argv[])
                                 
                                 if((ch = getchar()) == 'n')
                                 {
-                                        sprintf(mail_buffer, "%s</table>\n<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        sprintf(mail_buffer, "%s<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
                                         to_delete = 0;
                                 }
                                 else
-                                        sprintf(mail_buffer, "%s</table>\n<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        sprintf(mail_buffer, "%s<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
                                         
                                 #ifdef DEBUG_MODE 
                                 printf("PRESSED KEY: %c\n", ch);
                                 #endif
                         }
+			else
+				sprintf(mail_buffer, "%s<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database);
+
                         printf("\n\n");
                 }
         }

@@ -656,6 +656,8 @@ int main(int argc, char *argv[])
         
         // char mail_format_buf[_MAX_MAIL_LEN];
         
+	strcpy(mail_buffer, "");
+
         sprintf(buffer, "| name%*.*s| desc%*.*s| status%*.*s| gid%*.*s|\n", 11, 11, padding, 11, 11, padding, 9, 9, padding, 12, 12, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+\n", _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_DESC_LEN, _MAX_DESC_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding);
 
@@ -709,6 +711,7 @@ int main(int argc, char *argv[])
         
         if(to_insert)
         {
+		sprintf(mail_buffer, "%s</table>\n", mail_buffer);
                 printf("\n\nThe following %d records have to be INSERTED into the %s DB. ", to_insert, database);
                 
                 if(prompt_on_insert)
@@ -724,16 +727,19 @@ int main(int argc, char *argv[])
                         
                         if((ch = getchar()) == 'n')
                         {
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results NOT INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+                                sprintf(mail_buffer, "%s<p>%d results NOT INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
                                 to_insert = 0;
                         }
                         else
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+                                sprintf(mail_buffer, "%s<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
                                        
                         #ifdef DEBUG_MODE 
                         printf("PRESSED KEY: %c\n", ch);
                         #endif
                 }
+		else
+			sprintf(mail_buffer, "%s<p>%d results INSERTED into the %s DB.</p><br>\n", mail_buffer, to_insert, database);
+
                 printf("\n\n");
         }
         
@@ -791,6 +797,7 @@ int main(int argc, char *argv[])
         
         if(to_update)
         {
+		sprintf(mail_buffer, "%s</table>\n", mail_buffer);
                 printf("\n\nThe following %d records have to be UPDATED into the %s DB. ", to_update, database);
                 
                 if(prompt_on_update)
@@ -808,16 +815,19 @@ int main(int argc, char *argv[])
                         
                         if((ch = getchar()) == 'n')
                         {
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results NOT UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
+                                sprintf(mail_buffer, "%s<p>%d results NOT UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
                                 to_update = 0;
                         }
                         else
-                                sprintf(mail_buffer, "%s</table>\n<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
+                                sprintf(mail_buffer, "%s<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database); 
                                 
                         #ifdef DEBUG_MODE 
                         printf("PRESSED KEY: %c\n", ch);
                         #endif
                 }
+		else
+			sprintf(mail_buffer, "%s<p>%d results UPDATED into the %s DB.</p><br>", mail_buffer, to_update, database);
+
                 printf("\n\n");
         }
         
@@ -871,7 +881,8 @@ int main(int argc, char *argv[])
                 
                 if(to_delete)
                 {
-                        printf("\n\nThe following %d records have to be DELETED from the %s DB. ", to_delete, database);
+			sprintf(mail_buffer, "%s</table>\n", mail_buffer);
+			printf("\n\nThe following %d records have to be DELETED from the %s DB. ", to_delete, database);
                         
                         if(prompt_on_delete)
                         {
@@ -886,16 +897,19 @@ int main(int argc, char *argv[])
                                 
                                 if((ch = getchar()) == 'n')
                                 {
-                                        sprintf(mail_buffer, "%s</table>\n<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        sprintf(mail_buffer, "%s<p>%d results NOT DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
                                         to_delete = 0;
                                 }
                                 else
-                                        sprintf(mail_buffer, "%s</table>\n<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
+                                        sprintf(mail_buffer, "%s<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database); 
                                         
                                 #ifdef DEBUG_MODE 
                                 printf("PRESSED KEY: %c\n", ch);
                                 #endif
                         }
+			else
+				sprintf(mail_buffer, "%s<p>%d results DELETED from the %s DB.</p><br>", mail_buffer, to_delete, database);  
+
                         printf("\n\n");
                 }
         }
