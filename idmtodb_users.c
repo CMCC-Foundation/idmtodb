@@ -29,7 +29,7 @@
 #define BORDER  "-----------------------------------------------------" 
 
 // #define DEBUG_MODE
-#define INSERT_USER "CALL insert_user_2(?,?,?,?,?,?,?,?,?,?,?)"
+#define INSERT_USER "CALL insert_user_2(?,?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_USER "CALL update_user_2(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_USER_IGNORE_DIVISION_GROUP_NAME "CALL update_user_ignore_division_group_name(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_PRES_USER "CALL update_pres_user(?,?)"
@@ -51,6 +51,7 @@ enum
     P_IN_EXPIRATION_DATE,
     P_IN_VPN_EXPIRATION_DATE,
     P_IN_EMAIL,
+    P_IN_NSACCOUNT_LOCK,
     P_IN_IS_MACH_USER,
     MAX_IN_USER_IDM_PARAMS
 } insert_in_user_idm_enum;
@@ -733,8 +734,13 @@ int main(int argc, char *argv[])
 
 	// nsaccount_lock
 	char p_nsaccount_lock = 0;
+	ps_insert_user_params[P_IN_NSACCOUNT_LOCK].buffer_type = MYSQL_TYPE_TINY;
+        ps_insert_user_params[P_IN_NSACCOUNT_LOCK].buffer = (char *) &p_nsaccount_lock;
+        ps_insert_user_params[P_IN_NSACCOUNT_LOCK].length = &ul_zero_value;
+        ps_insert_user_params[P_IN_NSACCOUNT_LOCK].is_null = 0;
+
 	ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].buffer_type = MYSQL_TYPE_TINY;
-        ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].buffer = (int *) &p_nsaccount_lock;
+        ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].buffer = (char *) &p_nsaccount_lock;
         ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].length = &ul_zero_value;
         ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].is_null = 0;
 
@@ -746,7 +752,7 @@ int main(int argc, char *argv[])
         ps_insert_user_params[P_IN_IS_MACH_USER].is_null = 0;
 
         ps_update_user_params[P_INOUT_IS_MACH_USER].buffer_type = MYSQL_TYPE_TINY;
-        ps_update_user_params[P_INOUT_IS_MACH_USER].buffer = (int *) &p_is_mach_user;
+        ps_update_user_params[P_INOUT_IS_MACH_USER].buffer = (char *) &p_is_mach_user;
         ps_update_user_params[P_INOUT_IS_MACH_USER].length = &ul_zero_value;
         ps_update_user_params[P_INOUT_IS_MACH_USER].is_null = 0;
 
@@ -921,21 +927,21 @@ int main(int argc, char *argv[])
                 strcpy(pnt_user->closing_date, token);
 		token = token2+1;
 		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
+                *token2 = '\0';
+                aux = atoi(token);
+                #ifdef DEBUG_MODE
+                printf("nsaccount_lock is: %d\n", aux);
+                #endif
+                pnt_user->nsaccount_lock = aux;
+                //
+                token = token2+1;
+		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
 		*token2 = '\0'; // skip password field
 		#ifdef DEBUG_MODE
 		printf("password field: %s\n", token);
 		#endif
 		//
 		token = token2+1;
-		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
-                *token2 = '\0';
-		aux = atoi(token);
-                #ifdef DEBUG_MODE
-                printf("nsaccount_lock is: %d\n", aux);
-                #endif
-		pnt_user->nsaccount_lock = aux;
-                //
-                token = token2+1;
 		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0' && *token2 != '\n'; ++token2);
 		pnt_user->is_mach_user = token2 != token;
 		#ifdef DEBUG_MODE
@@ -1044,7 +1050,7 @@ int main(int argc, char *argv[])
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 					printf("gid differs\n");
 
-				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 					printf("group_names differs\n");			
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))
@@ -1068,7 +1074,7 @@ int main(int argc, char *argv[])
 
 				//#endif
 
-                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
+                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
                                    strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email) || pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock))
 				{

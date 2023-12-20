@@ -16,6 +16,7 @@ CREATE PROCEDURE update_user_2
      IN p_vpn_expiration_date DATE,
      IN p_email VARCHAR(64),
      IN p_closing_date DATE,
+     IN p_nsaccount_lock TINYINT,
      IN p_mach_user TINYINT
 )  
    BEGIN  
@@ -27,7 +28,7 @@ CREATE PROCEDURE update_user_2
 
     SET group_type = !p_mach_user;   
 	
-    UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email, closing_date = p_closing_date
+    UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email, nsaccount_lock = p_nsaccount_lock, closing_date = p_closing_date
     WHERE iduser_idm = p_iduser_idm;
 
     DELETE FROM user_group_idm WHERE iduserExt = p_iduser_idm AND type = 2;
