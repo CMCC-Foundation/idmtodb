@@ -15,7 +15,7 @@ cnt_managed=0
 divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
 jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
-print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,email,closing_date,password,mach") #,no_cmcc,closing_date,status")I
+print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
 
 #users_dict.extend(users_dict_preserved)
 #users_ldap_dict.update(users_ldap_preserved_dict)
@@ -65,6 +65,7 @@ for i in users_dict:
     uidnumber = int(uidnumber_str)
     gidnumber_str = i["gidnumber"][0]
     gidnumber = int(gidnumber_str)
+    nsaccount_lock = int(i["nsaccountlock"][0] == "TRUE")
     password = "password"
 
     if(not is_preserved):
@@ -145,7 +146,7 @@ for i in users_dict:
         print("memberOf: {}".format(memberOf))
         #print("---")
 
-    print("{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, i["mail"][0], closing_date, password, mach)) 
+    print("{};{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, i["mail"][0], closing_date, nsaccount_lock, password, mach)) 
     cnt += 1
 
 if(DEBUG_MODE):

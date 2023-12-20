@@ -30,8 +30,8 @@
 
 // #define DEBUG_MODE
 #define INSERT_USER "CALL insert_user_2(?,?,?,?,?,?,?,?,?,?,?)"
-#define UPDATE_USER "CALL update_user_2(?,?,?,?,?,?,?,?,?,?,?,?,?)"
-#define UPDATE_USER_IGNORE_DIVISION_GROUP_NAME "CALL update_user_ignore_division_group_name(?,?,?,?,?,?,?,?,?,?,?,?,?)"
+#define UPDATE_USER "CALL update_user_2(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+#define UPDATE_USER_IGNORE_DIVISION_GROUP_NAME "CALL update_user_ignore_division_group_name(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 #define UPDATE_PRES_USER "CALL update_pres_user(?,?)"
 #define DELETE_USER "CALL delete_user(?)"
 #define SELECT_ALL_USERS "CALL select_all_users_2( )"
@@ -71,6 +71,7 @@ enum
     P_INOUT_VPN_EXPIRATION_DATE,
     P_INOUT_EMAIL,
     P_INOUT_CLOSING_DATE,
+    P_INOUT_NSACCOUNT_LOCK,
     P_INOUT_IS_MACH_USER,
     MAX_INOUT_USER_IDM_PARAMS
 } insert_up_user_idm_enum;
@@ -160,6 +161,7 @@ typedef struct _idm_user_t
         char vpn_expiration_date[MAX_DATE_LEN];
         char email[MAX_EMAIL_LEN];
         char closing_date[MAX_DATE_LEN];
+	char nsaccount_lock;
 	char is_mach_user; // only valid for .csv->DB sync operations
 } idm_user_t;
 
@@ -728,6 +730,14 @@ int main(int argc, char *argv[])
         ps_update_user_params[P_INOUT_CLOSING_DATE].length = &p_closing_date_length;
         ps_update_user_params[P_INOUT_CLOSING_DATE].is_null = &is_null_closing_date;
         
+
+	// nsaccount_lock
+	char p_nsaccount_lock = 0;
+	ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].buffer_type = MYSQL_TYPE_TINY;
+        ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].buffer = (int *) &p_nsaccount_lock;
+        ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].length = &ul_zero_value;
+        ps_update_user_params[P_INOUT_NSACCOUNT_LOCK].is_null = 0;
+
 	// is_mach_user
         char p_is_mach_user = 0;
         ps_insert_user_params[P_IN_IS_MACH_USER].buffer_type = MYSQL_TYPE_TINY;
@@ -917,6 +927,15 @@ int main(int argc, char *argv[])
 		#endif
 		//
 		token = token2+1;
+		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
+                *token2 = '\0';
+		aux = atoi(token);
+                #ifdef DEBUG_MODE
+                printf("nsaccount_lock is: %d\n", aux);
+                #endif
+		pnt_user->nsaccount_lock = aux;
+                //
+                token = token2+1;
 		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0' && *token2 != '\n'; ++token2);
 		pnt_user->is_mach_user = token2 != token;
 		#ifdef DEBUG_MODE
@@ -943,7 +962,7 @@ int main(int argc, char *argv[])
                 pnt_user = &users_db[rows]; // &(users_db[rows].idm_user);
                 
                 #ifdef DEBUG_MODE
-                printf("PRE %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s\n", p_iduser_idm, p_username, p_name, p_surname, p_uid, p_gid, p_group_names, p_creation_date, is_null_expiration_date ? NULL_IDENTIFIER : p_expiration_date, is_null_vpn_expiration_date ? NULL_IDENTIFIER : p_vpn_expiration_date, is_null_email ? NULL_IDENTIFIER : p_email, is_null_closing_date ? NULL_IDENTIFIER : p_closing_date);
+                printf("PRE %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s, %d\n", p_iduser_idm, p_username, p_name, p_surname, p_uid, p_gid, p_group_names, p_creation_date, is_null_expiration_date ? NULL_IDENTIFIER : p_expiration_date, is_null_vpn_expiration_date ? NULL_IDENTIFIER : p_vpn_expiration_date, is_null_email ? NULL_IDENTIFIER : p_email, is_null_closing_date ? NULL_IDENTIFIER : p_closing_date, p_nsaccount_lock);
                 #endif
                
                 pnt_user->iduser_idm = p_iduser_idm; // users_db[rows].iduser_idm = p_iduser_idm; // pnt_user->iduser_idm = p_iduser_idm;
@@ -952,6 +971,7 @@ int main(int argc, char *argv[])
                 strcpy(pnt_user->surname, p_surname);
                 pnt_user->uid = p_uid;
                 pnt_user->gid = p_gid;
+		pnt_user->nsaccount_lock = p_nsaccount_lock;
                 strcpy(pnt_user->group_names, p_group_names);
                 // strcpy(pnt_user->division, p_division);
                 strcpy(pnt_user->creation_date, is_null_creation_date ? NULL_IDENTIFIER : p_creation_date);
@@ -961,7 +981,7 @@ int main(int argc, char *argv[])
                 strcpy(pnt_user->closing_date, is_null_closing_date ? NULL_IDENTIFIER : p_closing_date);
                 
                 #ifdef DEBUG_MODE
-                printf("POST %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s\n\n", pnt_user->iduser_idm, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date);
+                printf("POST %d, %s, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s, %d\n\n", pnt_user->iduser_idm, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date, pnt_user->nsaccount_lock);
                 #endif
                 
         }
@@ -1024,7 +1044,7 @@ int main(int argc, char *argv[])
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 					printf("gid differs\n");
 
-				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 					printf("group_names differs\n");			
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))
@@ -1043,11 +1063,14 @@ int main(int argc, char *argv[])
 					printf("email differs\n");
 				}
 
+				if(pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock)
+					printf("nsaccount_lock differs\n");
+
 				//#endif
 
-                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups)) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
+                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
                                    strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
-                                   strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email)))
+                                   strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email) || pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock))
 				{
                                         pnt_user->iduser_idm = pnt_user_db->iduser_idm; // update record on DB with IDM's record values, UPDATE_CODE.
 					printf("username: %s\n", pnt_user->username);
@@ -1064,7 +1087,7 @@ int main(int argc, char *argv[])
                 if(j == rows && !strcmp(pnt_user->closing_date, NULL_IDENTIFIER))
 		{
 			// (j == rows) // insert only if it has a non-null closing_date.
-			#ifdef DEBUG_MDOE
+			#ifdef DEBUG_MODE
 			printf("insert code for %s\n", pnt_user->username);
 			#endif
 			-- pnt_user->iduser_idm; // from STAY_CODE to INSERT_CODE.
@@ -1095,17 +1118,17 @@ int main(int argc, char *argv[])
         register unsigned char headered = 0;
         const char * padding = PADDING; //  "#####################################################";
         const char * border_padding = BORDER; 
-        char p_numbers[2][33]; // for uid and gid, respectively
+        char p_numbers[3][33]; // for uid and gid, respectively
         char buffer[MAX_BUFLINE_LEN];
         char border_buffer[MAX_BUFLINE_LEN];
         char mail_buffer[MAX_LOGBUF_LEN];
         int padLens[10];
-        int numbersPadLens[2];
+        int numbersPadLens[3];
         
         // char mail_format_buf[_MAX_MAIL_LEN];
         
-        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s| closing_date%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding);
-        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAMES_LEN, _MAX_GROUP_NAMES_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
+        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| email%*.*s| closing_date%*.*s| nsaccount_lock%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding, 1, 1, padding);
+        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAMES_LEN, _MAX_GROUP_NAMES_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding);
          
 	strcpy(mail_buffer, "");
 
@@ -1118,7 +1141,7 @@ int main(int argc, char *argv[])
                 {
                         if(!headered)
                         {
-                                sprintf(mail_buffer, "<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th></tr>\n");
+                                sprintf(mail_buffer, "<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th><th>nsaccount_lock</th></tr>\n");
                                 headered = 1;
                                 printf(border_buffer);
                                 printf(buffer);
@@ -1154,7 +1177,9 @@ int main(int argc, char *argv[])
                         numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         sprintf(p_numbers[1], "%d", pnt_user->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
-                        
+                        sprintf(p_numbers[2], "%d", pnt_user->nsaccount_lock);
+                        numbersPadLens[2] = NUMBERS_FIXED_LEN - strlen(p_numbers[2]);
+
                         /*
                         #ifdef DEBUG_MODE
                         printf("strlen username: %d, padlens 0: %d\n", strlen(pnt_user->username), padLens[0]);
@@ -1166,9 +1191,9 @@ int main(int argc, char *argv[])
                                 padLens[7] = 0;
                       
                     
-                                printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_names, padLens[3], padLens[3], padding, pnt_user->creation_date, padLens[4], padLens[4], padding, pnt_user->expiration_date, padLens[5], padLens[5], padding, pnt_user->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user->email, padLens[7], padLens[7], padding, pnt_user->closing_date, padLens[8], padLens[8], padding);
+                                printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_names, padLens[3], padLens[3], padding, pnt_user->creation_date, padLens[4], padLens[4], padding, pnt_user->expiration_date, padLens[5], padLens[5], padding, pnt_user->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user->email, padLens[7], padLens[7], padding, pnt_user->closing_date, padLens[8], padLens[8], padding, numbersPadLens[2], numbersPadLens[2], padding, p_numbers[2]);
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>\n", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td></tr>\n", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date, pnt_user->nsaccount_lock);
                         
                 } 
         }
@@ -1231,7 +1256,7 @@ int main(int argc, char *argv[])
                 {
                         if(!headered)
                         {
-                                sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th></tr>\n", mail_buffer);
+                                sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th><th>nsaccount_lock</th></tr>\n", mail_buffer);
                                 headered = 1;
                                 printf(border_buffer);
                                 printf(buffer);
@@ -1267,7 +1292,9 @@ int main(int argc, char *argv[])
                         numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         sprintf(p_numbers[1], "%d", pnt_user->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
-                        
+                       	sprintf(p_numbers[2], "%d", pnt_user->nsaccount_lock);
+                        numbersPadLens[2] = NUMBERS_FIXED_LEN - strlen(p_numbers[2]);
+
                         /*
                         #ifdef DEBUG_MODE
                         printf("strlen username: %d, padlens 0: %d\n", strlen(pnt_user->username), padLens[0]);
@@ -1278,9 +1305,9 @@ int main(int argc, char *argv[])
                         if(padLens[7] <= 0)
                                 padLens[7] = 0;   
                     
-                                printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_names, padLens[3], padLens[3], padding, pnt_user->creation_date, padLens[4], padLens[4], padding, pnt_user->expiration_date, padLens[5], padLens[5], padding, pnt_user->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user->email, padLens[7], padLens[7], padding, pnt_user->closing_date, padLens[8], padLens[8], padding);
+                                printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|\n", pnt_user->username, padLens[0], padLens[0], padding, pnt_user->name, padLens[1], padLens[1], padding, pnt_user->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user->group_names, padLens[3], padLens[3], padding, pnt_user->creation_date, padLens[4], padLens[4], padding, pnt_user->expiration_date, padLens[5], padLens[5], padding, pnt_user->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user->email, padLens[7], padLens[7], padding, pnt_user->closing_date, padLens[8], padLens[8], padding, numbersPadLens[2], numbersPadLens[2], padding, p_numbers[2]);
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>\n", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td></tr>\n", mail_buffer, pnt_user->username, pnt_user->name, pnt_user->surname, pnt_user->uid, pnt_user->gid, pnt_user->group_names, pnt_user->creation_date, pnt_user->expiration_date, pnt_user->vpn_expiration_date, pnt_user->email, pnt_user->closing_date, pnt_user->nsaccount_lock);
                         
                 } 
         }
@@ -1340,7 +1367,7 @@ int main(int argc, char *argv[])
                         {
                                 if(!headered)
                                 {
-                                        sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th></tr>\n", mail_buffer);
+                                        sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>username</th><th>name</th><th>surname</th><th>uid</th><th>gid</th><th>group_names</th><th>creation_date</th><th>expiration_date</th><th>vpn_expiration_date</th><th>email</th><th>closing_date</th><th>nsaccount_lock</th></tr>\n", mail_buffer);
                                         headered = 1;
                                         printf(border_buffer);
                                         printf(buffer);
@@ -1376,7 +1403,9 @@ int main(int argc, char *argv[])
                                 numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                                 sprintf(p_numbers[1], "%d", pnt_user_db->gid);
                                 numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
-                                
+                                sprintf(p_numbers[2], "%d", pnt_user->nsaccount_lock);
+                        	numbersPadLens[2] = NUMBERS_FIXED_LEN - strlen(p_numbers[2]);
+
                                 /*
                                 #ifdef DEBUG_MODE
                                 printf("strlen username: %d, padlens 0: %d\n", strlen(pnt_user_db->username), padLens[0]);
@@ -1387,9 +1416,9 @@ int main(int argc, char *argv[])
                                 if(padLens[7] <= 0)
                                         padLens[7] = 0;   
                             
-                                        printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|\n", pnt_user_db->username, padLens[0], padLens[0], padding, pnt_user_db->name, padLens[1], padLens[1], padding, pnt_user_db->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user_db->group_names, padLens[3], padLens[3], padding, pnt_user_db->creation_date, padLens[4], padLens[4], padding, pnt_user_db->expiration_date, padLens[5], padLens[5], padding, pnt_user_db->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user_db->email, padLens[7], padLens[7], padding, pnt_user_db->closing_date, padLens[8], padLens[8], padding);
+                                        printf("| %s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s| %.15s%*.*s|%*.*s%s|\n", pnt_user_db->username, padLens[0], padLens[0], padding, pnt_user_db->name, padLens[1], padLens[1], padding, pnt_user_db->surname, padLens[2], padLens[2], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_user_db->group_names, padLens[3], padLens[3], padding, pnt_user_db->creation_date, padLens[4], padLens[4], padding, pnt_user_db->expiration_date, padLens[5], padLens[5], padding, pnt_user_db->vpn_expiration_date, padLens[6], padLens[6], padding, pnt_user_db->email, padLens[7], padLens[7], padding, pnt_user_db->closing_date, padLens[8], padLens[8], padding, numbersPadLens[2], numbersPadLens[2], padding, p_numbers[2]);
                                         
-                                sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td></tr>\n", mail_buffer, pnt_user_db->username, pnt_user_db->name, pnt_user_db->surname, pnt_user_db->uid, pnt_user_db->gid, pnt_user_db->group_names, pnt_user_db->creation_date, pnt_user_db->expiration_date, pnt_user_db->vpn_expiration_date, pnt_user_db->email, pnt_user_db->closing_date);
+                                sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%.15s</td><td>%d</td></tr>\n", mail_buffer, pnt_user_db->username, pnt_user_db->name, pnt_user_db->surname, pnt_user_db->uid, pnt_user_db->gid, pnt_user_db->group_names, pnt_user_db->creation_date, pnt_user_db->expiration_date, pnt_user_db->vpn_expiration_date, pnt_user_db->email, pnt_user_db->closing_date, pnt_user->nsaccount_lock);
                                 
                         } 
                 }
@@ -1489,11 +1518,14 @@ int main(int argc, char *argv[])
                                 p_group_names_length = strlen(p_group_names);
 
 				#ifdef DEBUG_MODE
-				printf("pnt_user->is_mach_user: %s\n", pnt_user->is_mach_user);
+				printf("pnt_user->nsaccount_lock: %d\n", pnt_user->nsaccount_lock);
+				printf("pnt_user->is_mach_user: %d\n", pnt_user->is_mach_user);
 				#endif
 
+				p_nsaccount_lock = pnt_user->nsaccount_lock;
 				p_is_mach_user = pnt_user->is_mach_user;
-                                
+
+
 				if(pnt_user->creation_date && strcmp(pnt_user->creation_date, NULL_IDENTIFIER) && strlen(pnt_user->creation_date))
                                 {
 
