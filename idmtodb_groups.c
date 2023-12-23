@@ -99,7 +99,7 @@ enum
 #define _MAX_DESC_LEN 16
 #define _MAX_DATE_LEN 16
 
-#define MAX_LINE_LEN 2*(MAX_NAME_LEN+MAX_DESC_LEN+6) // added 2* for safety
+#define MAX_LINE_LEN 2*(MAX_NAME_LEN+MAX_DESC_LEN+MAX_DATE_LEN+6) // added 2* for safety
 #define MAX_BUFLINE_LEN MAX_LINE_LEN
 #define NUMBERS_FIXED_LEN 16 // 21 // 16
 
@@ -697,7 +697,7 @@ int main(int argc, char *argv[])
         char buffer[MAX_BUFLINE_LEN];
         char border_buffer[MAX_BUFLINE_LEN];
         char mail_buffer[MAX_LOGBUF_LEN];
-        int padLens[10];
+        int padLens[3];
         int numbersPadLens[2];
         
         // char mail_format_buf[_MAX_MAIL_LEN];
@@ -705,7 +705,7 @@ int main(int argc, char *argv[])
 	strcpy(mail_buffer, "");
 
         sprintf(buffer, "| name%*.*s| desc%*.*s| status%*.*s| gid%*.*s| creation_date%*.*s|\n", 11, 11, padding, 11, 11, padding, 9, 9, padding, 12, 12, padding, 2, 2, padding);
-        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s\n", _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_DESC_LEN, _MAX_DESC_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
+        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_DESC_LEN, _MAX_DESC_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
 
         for(i=0; i<line_num; ++i)
         {
@@ -741,9 +741,9 @@ int main(int argc, char *argv[])
                         numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         sprintf(p_numbers[1], "%d", pnt_group->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
+                       
+                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%s%*.*s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding); 	
                         
-                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding); 	
-                                
                         sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%s</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid, pnt_group->creation_date);
                         
                 } 
@@ -833,7 +833,7 @@ int main(int argc, char *argv[])
                         sprintf(p_numbers[1], "%d", pnt_group->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
 
-                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding);
+                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%s%*.*s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding);
 
                         sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%s</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid, pnt_group->creation_date);
 
