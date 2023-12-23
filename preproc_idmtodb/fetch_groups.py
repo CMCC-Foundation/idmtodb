@@ -1,5 +1,6 @@
 import sys
 from group_found_json import groups_dict
+from group_ldap_found import groups_ldap_dict
 DEBUG_MODE=False #True
 
 
@@ -25,9 +26,15 @@ for i in groups_dict:
     description = i["description"][0].replace(',','').replace(';','') if "description" in this_group_key else None 
 
     gidnumber = i["gidnumber"][0] if "gidnumber" in this_group_key else None
-  
+
+    creation_date = None
+
+    if(group_name in groups_ldap_dict.keys()):
+        creation_date_raw = groups_ldap_dict[group_name] #[uidnumber_str] #j["createTimestamp"]
+        creation_date = creation_date_raw[:4]+'-'+creation_date_raw[4:6]+'-'+creation_date_raw[6:8]
+
     if(group_name not in jolly_groups):
-        print("{};{};{};{}".format(group_name, description, status, gidnumber))
+        print("{};{};{};{};{}".format(group_name, description, status, gidnumber, creation_date))
 
 
 

@@ -1019,7 +1019,7 @@ int main(int argc, char *argv[])
                 {
                         pnt_user_db = &users_db[j];
                         // printf("idm_uid: %d, db_uid: %d\n", pnt_user->uid, pnt_user_db->uid);
-                        if(!strcmp(pnt_user->username, pnt_user_db->username)) // pnt_user->uid == pnt_user_db->uid)
+                        if((!strcmp(pnt_user->username, pnt_user_db->username)) && !strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) // pnt_user->uid == pnt_user_db->uid)
                         {
                                 
 				// printf("username: %s\n", pnt_user->username);
@@ -1031,7 +1031,11 @@ int main(int argc, char *argv[])
 
 				// printf("-----------\n");
 				if(strcmp(pnt_user->closing_date, pnt_user_db->closing_date))
-					printf("closing_date differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] closing_date, differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->closing_date, pnt_user_db->closing_date);
+				}
 
 				/*
 				if(strcmp(pnt_user->username, pnt_user_db->username))
@@ -1039,49 +1043,77 @@ int main(int argc, char *argv[])
 				*/
 
 				if(strcmp(pnt_user->name, pnt_user_db->name))
-					printf("name differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] name differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->name, pnt_user_db->name);
+				}
 
 				if(strcmp(pnt_user->surname, pnt_user_db->surname))
-                                        printf("surname differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] surname differs\n", pnt_user->username);
+                                        printf("IDM: %s, DB: %s\n", pnt_user->surname, pnt_user_db->surname);
+				}
 
 				if(pnt_user->uid != pnt_user_db->uid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
-                                        printf("uid differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] uid differs\n", pnt_user->username);
+                                        printf("IDM: %d, DB: %d\n", pnt_user->uid, pnt_user_db->uid);
+				}
 
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
-					printf("gid differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] gid differs\n", pnt_user->username);
+					printf("IDM: %d, DB: %d\n", pnt_user->gid, pnt_user_db->gid);
+				}
 
-				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
-					printf("group_names differs\n");			
+				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] group_names differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->group_names, pnt_user_db->group_names);
+				}		
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))
-					printf("creation date differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] creation_date differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->creation_date, pnt_user_db->creation_date);
+				}
 
 				if(strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date))
-					printf("expiration date differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] expiration_date differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->expiration_date, pnt_user_db->expiration_date);
+				}
 
 				if(strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date))
-					printf("vpn_expiration_date differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] vpn_expiration_date differs\n", pnt_user->username);
+					printf("IDM: %s, DB: %s\n", pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date);
+				}
 				
 				if(strcmp(pnt_user->email, pnt_user_db->email))
 				{
-					printf("IDM Email: %s\n", pnt_user->email);
-					printf("DB Email: %s\n", pnt_user_db->email);
-					printf("email differs\n");
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] email differs\n", pnt_user->username);	
+					printf("IDM: %s, DB: %s\n", pnt_user->email, pnt_user_db->email);
 				}
 
 				if(pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock)
-					printf("nsaccount_lock differs\n");
+				{
+					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
+					printf("[%s] nsaccount_lock differs\n", pnt_user->username);
+					printf("IDM: %d, DB: %d\n", pnt_user->nsaccount_lock, pnt_user_db->nsaccount_lock);
+				}
 
 				//#endif
 
-                                if((!strcmp(pnt_user_db->closing_date, NULL_IDENTIFIER)) && (strcmp(pnt_user->closing_date, pnt_user_db->closing_date) || strcmp(pnt_user->name, pnt_user_db->name) || strcmp(pnt_user->surname, pnt_user_db->surname)|| pnt_user->uid != pnt_user_db->uid || ((!ignore_groups) && (pnt_user->gid != pnt_user_db->gid || !are_groups_same(pnt_user->group_names, pnt_user_db->group_names))) || //strcmp(pnt_user->group_names, pnt_user_db->group_names)))  ||
-                                   strcmp(pnt_user->creation_date, pnt_user_db->creation_date) || strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date) ||
-                                   strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date) || strcmp(pnt_user->email, pnt_user_db->email) || pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock))
-				{
-                                        pnt_user->iduser_idm = pnt_user_db->iduser_idm; // update record on DB with IDM's record values, UPDATE_CODE.
-					printf("username: %s\n", pnt_user->username);
-					// printf("-----------\n");
-				}
                                 break; // do it in any case, if iduser_idm field of pnt_user structure still hasn't been valued from there, however it should have the very initial value, STAY_CODE.
                         }    
                 }

@@ -107,10 +107,10 @@ for i in users_dict:
 
     if(username in users_ldap_dict.keys()):
         if(not is_preserved):
-            creation_date_raw = users_ldap_dict[username] #uidnumber_str] #j["createTimestamp"]
+            creation_date_raw = users_ldap_dict[username] #[uidnumber_str] #j["createTimestamp"]
             creation_date = creation_date_raw[:4]+'-'+creation_date_raw[4:6]+'-'+creation_date_raw[6:8]
         else:
-            closing_date_raw = users_ldap_dict[username] #uidnumber_str]
+            closing_date_raw = users_ldap_dict[username] #[uidnumber_str]
             closing_date = closing_date_raw[:4]+'-'+closing_date_raw[4:6]+'-'+closing_date_raw[6:8]
 
     if(username in users_vpn_dict.keys()):

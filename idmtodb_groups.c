@@ -29,8 +29,8 @@
 #define BORDER  "-----------------------------------------------------" 
 
 // #define DEBUG_MODE
-#define INSERT_GROUP "CALL insert_group(?,?,?,?)"
-#define UPDATE_GROUP "CALL update_group(?,?,?,?,?)"
+#define INSERT_GROUP "CALL insert_group(?,?,?,?,?)"
+#define UPDATE_GROUP "CALL update_group(?,?,?,?,?,?)"
 #define DELETE_GROUP "CALL delete_group(?)"
 #define SELECT_ALL_GROUPS "CALL select_all_groups( )"
 
@@ -43,6 +43,7 @@ enum
     P_IN_DESC,
     P_IN_STATUS,
     P_IN_GID,
+    P_IN_CREATION_DATE,
     MAX_IN_GROUP_IDM_PARAMS
 } insert_in_group_idm_enum;
 
@@ -55,6 +56,7 @@ enum
     P_INOUT_DESC,
     P_INOUT_STATUS,
     P_INOUT_GID,
+    P_INOUT_CREATION_DATE,
     MAX_INOUT_GROUP_IDM_PARAMS
 } insert_up_group_idm_enum;
 
@@ -91,9 +93,11 @@ enum
 
 #define MAX_NAME_LEN 32
 #define MAX_DESC_LEN 512
+#define MAX_DATE_LEN 100
 
 #define _MAX_NAME_LEN 16
 #define _MAX_DESC_LEN 16
+#define _MAX_DATE_LEN 16
 
 #define MAX_LINE_LEN 2*(MAX_NAME_LEN+MAX_DESC_LEN+6) // added 2* for safety
 #define MAX_BUFLINE_LEN MAX_LINE_LEN
@@ -114,6 +118,7 @@ typedef struct _idm_group_t
         int idgroup_idm; //  
         char name[MAX_NAME_LEN];
         char desc[MAX_DESC_LEN];
+	char creation_date[MAX_DATE_LEN];
         char status;
         int gid;
 } idm_group_t;
@@ -409,6 +414,24 @@ int main(int argc, char *argv[])
         ps_update_group_params[P_INOUT_GID].length = &ul_zero_value;
         ps_update_group_params[P_INOUT_GID].is_null = 0;
 
+	// creation_date
+        my_bool is_null_creation_date;
+        unsigned long p_creation_date_length = 0;
+        char p_creation_date[MAX_DATE_LEN];
+        ps_insert_group_params[P_IN_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
+        ps_insert_group_params[P_IN_CREATION_DATE].buffer = (char *) p_creation_date;
+        ps_insert_group_params[P_IN_CREATION_DATE].buffer_length = MAX_DATE_LEN;
+        ps_insert_group_params[P_IN_CREATION_DATE].length = &p_creation_date_length;
+        ps_insert_group_params[P_IN_CREATION_DATE].is_null = &is_null_creation_date;
+
+	ps_update_group_params[P_INOUT_CREATION_DATE].buffer_type = MYSQL_TYPE_STRING;
+        ps_update_group_params[P_INOUT_CREATION_DATE].buffer = (char *) p_creation_date;
+        ps_update_group_params[P_INOUT_CREATION_DATE].buffer_length = MAX_DATE_LEN;
+        ps_update_group_params[P_INOUT_CREATION_DATE].length = &p_creation_date_length;
+        ps_update_group_params[P_INOUT_CREATION_DATE].is_null = &is_null_creation_date;
+
+
+
         #ifdef DEBUG_MODE
         printf("\nbefore mysql_stmt_bind_param.\n");
         #endif
@@ -512,13 +535,22 @@ int main(int argc, char *argv[])
                 token = token2+1;
 
 		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
-                *(token2-1) = '\0';
+                *token2 = '\0';
                 aux = atoi(token);
                 #ifdef DEBUG_MODE
                 printf("gid is: %d\n", aux);
                 #endif
                 pnt_group->gid = aux;
                 token = token2+1;
+
+		for(token2 = token; *token2 != CSV_SEPARATOR && *token2 != '\0'; ++token2);
+                *(token2-1) = '\0';
+                #ifdef DEBUG_MODE
+                printf("creation_date is: %s\n", token);
+                #endif
+                strcpy(pnt_group->creation_date, token);
+                token = token2+1;
+
 
 	}
         
@@ -536,7 +568,7 @@ int main(int argc, char *argv[])
                 pnt_group = &groups_db[rows]; // &(groups_db[rows].idm_group);
                 
                 #ifdef DEBUG_MODE
-                printf("PRE %d, %s, %s, %d, %d\n", p_idgroup_idm, p_name, p_desc, p_status, p_gid);
+                printf("PRE %d, %s, %s, %d, %d, %s\n", p_idgroup_idm, p_name, p_desc, p_status, p_gid, p_creation_date);
                 #endif
                
                 pnt_group->idgroup_idm = p_idgroup_idm; // groups_db[rows].idgroup_idm = p_idgroup_idm; // pnt_group->idgroup_idm = p_idgroup_idm;
@@ -544,9 +576,10 @@ int main(int argc, char *argv[])
                 strcpy(pnt_group->desc, p_desc);
                 pnt_group->status = p_status;
                 pnt_group->gid = p_gid;
+		strcpy(pnt_group->creation_date, is_null_creation_date ? NULL_IDENTIFIER : p_creation_date);
                               
                 #ifdef DEBUG_MODE
-                printf("POST %d, %s, %s, %d, %d\n\n", pnt_group->idgroup_idm, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid);
+                printf("POST %d, %s, %s, %d, %d\n\n", pnt_group->idgroup_idm, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid, pnt_group->creation_date);
                 #endif
                 
         }
@@ -595,20 +628,33 @@ int main(int argc, char *argv[])
 				*/
 
 				if(strcmp(pnt_group->desc, pnt_group_db->desc))
-                                        printf("desc differs\n");
+				{
+					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
+                                        printf("[%s] desc differs\n", pnt_group->name);
+					printf("IDM: %s, DB: %s\n", pnt_group->desc, pnt_group_db->desc);
+				}
 
 				if(pnt_group->status != pnt_group_db->status)
-                                        printf("status differs\n");
+				{
+					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
+					printf("[%s] status differs\n", pnt_group->name);
+                                        printf("IDM: %d, DB: %d\n", pnt_group->status, pnt_group_db->status);
+				}
 
 				if(pnt_group->gid != pnt_group_db->gid)
-					printf("gid differs\n");
-
-                                if(strcmp(pnt_group->desc, pnt_group_db->desc) || pnt_group->gid != pnt_group_db->gid || pnt_group->status != pnt_group_db->status)
 				{
-                                        pnt_group->idgroup_idm = pnt_group_db->idgroup_idm; // update record on DB with IDM's record values, UPDATE_CODE.
-					printf("name: %s\n", pnt_group->name);
-					// printf("-----------\n");
+					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
+					printf("[%s] gid differs\n", pnt_group->name);
+					printf("IDM: %d, DB: %d\n", pnt_group->gid, pnt_group_db->gid);
 				}
+
+				if(strcmp(pnt_group->creation_date, pnt_group_db->creation_date))
+                                {
+                                        pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
+                                        printf("[%s] creation_date differs\n", pnt_group->name);
+                                        printf("IDM: %s, DB: %s\n", pnt_group->creation_date, pnt_group_db->creation_date);
+                                }
+
                                 break; // do it in any case, if idgroup_idm field of pnt_group structure still hasn't been valued from there, however it should have the very initial value, STAY_CODE.
                         }    
                 }
@@ -658,8 +704,8 @@ int main(int argc, char *argv[])
         
 	strcpy(mail_buffer, "");
 
-        sprintf(buffer, "| name%*.*s| desc%*.*s| status%*.*s| gid%*.*s|\n", 11, 11, padding, 11, 11, padding, 9, 9, padding, 12, 12, padding);
-        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+\n", _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_DESC_LEN, _MAX_DESC_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding);
+        sprintf(buffer, "| name%*.*s| desc%*.*s| status%*.*s| gid%*.*s| creation_date%*.*s|\n", 11, 11, padding, 11, 11, padding, 9, 9, padding, 12, 12, padding, 2, 2, padding);
+        sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s\n", _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_DESC_LEN, _MAX_DESC_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding);
 
         for(i=0; i<line_num; ++i)
         {
@@ -670,7 +716,7 @@ int main(int argc, char *argv[])
                 {
                         if(!headered)
                         {
-                                sprintf(mail_buffer, "<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th></tr>\n");
+                                sprintf(mail_buffer, "<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th><th>creation_date</th></tr>\n");
                                 headered = 1;
                                 printf(border_buffer);
                                 printf(buffer);
@@ -688,15 +734,17 @@ int main(int argc, char *argv[])
                         
                         if(padLens[1] <= 0)
                                 padLens[1] = 0;           
+
+			padLens[2] = _MAX_DATE_LEN - strlen(pnt_group->creation_date) -1;
               
                         sprintf(p_numbers[0], "%d", pnt_group->status);
                         numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         sprintf(p_numbers[1], "%d", pnt_group->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
                         
-                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1]); 	
+                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding); 	
                                 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%s</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid, pnt_group->creation_date);
                         
                 } 
         }
@@ -759,7 +807,7 @@ int main(int argc, char *argv[])
                 {
 			if(!headered)
                         {
-                                sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th></tr>\n", mail_buffer);
+                                sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th><th>creation_date</th></tr>\n", mail_buffer);
                                 headered = 1;
                                 printf(border_buffer);
                                 printf(buffer);
@@ -778,14 +826,16 @@ int main(int argc, char *argv[])
                         if(padLens[1] <= 0)
                                 padLens[1] = 0;
 
+			padLens[2] = _MAX_DATE_LEN - strlen(pnt_group->creation_date) -1;
+
                         sprintf(p_numbers[0], "%d", pnt_group->status);
                         numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         sprintf(p_numbers[1], "%d", pnt_group->gid);
                         numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
 
-                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1]);
+                        printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding);
 
-                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid);
+                        sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td><td>%s</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid, pnt_group->creation_date);
 
                 } 
         }
@@ -846,7 +896,7 @@ int main(int argc, char *argv[])
                                
 				if(!headered)
                         	{
-                             		sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th></tr>\n", mail_buffer);
+                             		sprintf(mail_buffer, "%s<table style=\"background-color: black; color: #adff29;\"><tr style=\"color: red; font-weight: bold;\"><th>name</th><th>desc</th><th>status</th><th>gid</th><th>creation_date</th></tr>\n", mail_buffer);
                              		headered = 1;
                            	        printf(border_buffer);
                           		printf(buffer);
@@ -865,12 +915,14 @@ int main(int argc, char *argv[])
                         	if(padLens[1] <= 0)
                                 	padLens[1] = 0;
 
+				padLens[2] = _MAX_DATE_LEN - strlen(pnt_group->creation_date) -1;
+
                         	sprintf(p_numbers[0], "%d", pnt_group->status);
                         	numbersPadLens[0] = NUMBERS_FIXED_LEN - strlen(p_numbers[0]);
                         	sprintf(p_numbers[1], "%d", pnt_group->gid);
                         	numbersPadLens[1] = NUMBERS_FIXED_LEN - strlen(p_numbers[1]);
 
-                        	printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1]);
+                        	printf("| %.15s%*.*s| %.15s%*.*s|%*.*s%s|%*.*s%s|%*.*s%s|\n", pnt_group->name, padLens[0], padLens[0], padding, pnt_group->desc, padLens[1], padLens[1], padding, numbersPadLens[0], numbersPadLens[0], padding, p_numbers[0], numbersPadLens[1], numbersPadLens[1], padding, p_numbers[1], pnt_group->creation_date, padLens[2], padLens[2], padding);
 
                         	sprintf(mail_buffer, "%s<tr><td>%.15s</td><td>%.15s</td><td>%d</td><td>%d</td></tr>\n", mail_buffer, pnt_group->name, pnt_group->desc, pnt_group->status, pnt_group->gid);
                         }
@@ -959,6 +1011,26 @@ int main(int argc, char *argv[])
                                 #endif
                                 p_gid = pnt_group->gid;
                                
+				if(pnt_group->creation_date && strcmp(pnt_group->creation_date, NULL_IDENTIFIER) && strlen(pnt_group->creation_date))
+                                {
+
+                                        is_null_creation_date = 0;
+                                        #ifdef DEBUG_MODE
+                                        printf("creation_date not null\n");
+                                        printf("pnt_group->creation_date: %s\n", pnt_group->creation_date);
+                                        #endif
+                                        strcpy(p_creation_date, pnt_group->creation_date);
+                                        p_creation_date_length = strlen(p_creation_date);
+                                }
+                                else
+                                {
+                                        #ifdef DEBUG_MODE
+                                        printf("creation_date null\n");
+                                        #endif
+                                        is_null_creation_date = 1;
+                                        p_creation_date_length = 0;
+                                }
+
                                 if(_to_update)
                                 {
                                         #ifdef DEBUG_MODE

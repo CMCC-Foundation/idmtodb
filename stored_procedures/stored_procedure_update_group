@@ -8,9 +8,10 @@ CREATE PROCEDURE update_group
      IN p_name VARCHAR(32),
      IN p_desc VARCHAR(512),
      IN p_status TINYINT,
-     IN p_gid INT
+     IN p_gid INT,
+     IN p_creation_date DATE
 )  
    BEGIN
-	UPDATE idmdb.group SET name = p_name, idmdb.group.desc = p_desc, status = p_status, gid = p_gid WHERE idgroup = p_idgroup_idm; 
+	UPDATE idmdb.group SET name = p_name, idmdb.group.desc = p_desc, status = p_status, gid = p_gid, creation_date = p_creation_date WHERE idgroup = p_idgroup_idm; 
    END
    ;;
