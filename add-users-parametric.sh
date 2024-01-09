@@ -211,7 +211,7 @@ for line in $(tail "$stage_file_loc" -n+2); do
 	if [[ ! -z "$issuer" ]];
 	then
         	scp "$docx_filename_out" "root@sccdb.cmcc.scc":"/root/gdrive_API/files/"
-		ssh -l root "sccdb.cmcc.scc" "source /root/gdrive_API/gdrive_venv/bin/activate; cd /root/gdrive_API; mkdir -p files/$out_dir_name ; mv files/$(echo $docx_filename_out | cut -d'/' -f2) files/$docx_filename_out ; python3 upload_docx_convert_to_pdf.py files/$docx_filename_out $name_dot_surname $email $issuer >> files/$out_dir_name/drive_api_log"
+		ssh -l root "sccdb.cmcc.scc" "source /root/gdrive_API/gdrive_venv/bin/activate; cd /root/gdrive_API; mkdir -p files/$out_dir_name ; mv files/$(echo $docx_filename_out | cut -d'/' -f2) files/$docx_filename_out ; python3 upload_docx_convert_to_pdf.py files/$docx_filename_out $name_dot_surname $email $issuer >> files/$out_dir_name/drive_api_log ; cat files/$out_dir_name/drive_api_log"
 	fi
 
         #ipa otptoken-add --type=totp --owner=sysm07 | grep URI | sed 's/  URI: //g'
