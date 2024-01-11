@@ -13,6 +13,7 @@ CREATE PROCEDURE insert_user_2
      IN p_creation_date DATE,
      IN p_expiration_date DATE,
      IN p_vpn_expiration_date DATE,
+     IN p_psw_expiration_date DATE,
      IN p_email VARCHAR(64),
      IN p_nsaccount_lock TINYINT,
      IN p_mach_user TINYINT
@@ -24,8 +25,8 @@ CREATE PROCEDURE insert_user_2
   	DECLARE SubStrLen INT DEFAULT 0;
         DECLARE group_name VARCHAR(32);   
 
- 	INSERT INTO user_idm (username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email, nsaccount_lock)
-    VALUES (p_username, p_name, p_surname, p_uid, p_gid, p_creation_date, p_expiration_date, p_vpn_expiration_date, p_email, p_nsaccount_lock);
+ 	INSERT INTO user_idm (username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, psw_expiration_date, email, nsaccount_lock)
+    VALUES (p_username, p_name, p_surname, p_uid, p_gid, p_creation_date, p_expiration_date, p_vpn_expiration_date, p_psw_expiration_date, p_email, p_nsaccount_lock);
     	SET user_idm_lid = LAST_INSERT_ID();
         SET group_type = !p_mach_user;
 

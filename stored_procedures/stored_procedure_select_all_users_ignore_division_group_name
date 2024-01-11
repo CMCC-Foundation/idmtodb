@@ -6,6 +6,6 @@ CREATE PROCEDURE select_all_users_ignore_division_group_name
 ( 
 )  
    BEGIN  
-	SELECT iduser_idm, username, name, surname, uid, gid, GROUP_CONCAT(real_group_name ORDER BY iduser_group_idm) AS real_group_names, creation_date, expiration_date, vpn_expiration_date, email, closing_date, nsaccount_lock, 0 FROM tmp_user_group WHERE type = 2 GROUP BY iduser_idm, username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email, notes, closing_date, nsaccount_lock;
+	SELECT iduser_idm, username, name, surname, uid, gid, GROUP_CONCAT(real_group_name ORDER BY iduser_group_idm) AS real_group_names, creation_date, expiration_date, vpn_expiration_date, psw_expiration_date, email, closing_date, nsaccount_lock, 0 FROM tmp_user_group WHERE type = 2 GROUP BY iduser_idm, username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, email, notes, closing_date, nsaccount_lock;
    END
    ;;

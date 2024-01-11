@@ -11,11 +11,12 @@ DIVISION_GROUP_STR="This is a division group"
 
 #print("users_dict len: {}".format(len(users_dict)))
 cnt=0
-cnt_managed=0
+cnt_exp_managed=0
+cnt_psw_exp_managed=0
 divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
 jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
-print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
+print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,psw_expiration_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
 
 #users_dict.extend(users_dict_preserved)
 #users_ldap_dict.update(users_ldap_preserved_dict)
@@ -60,6 +61,7 @@ for i in users_dict:
     creation_date = None
     closing_date = None
     krbPrincipalExpiration = None
+    krbPasswordExpiration = None
     vpn_expiration_date = None
     uidnumber_str = i["uidnumber"][0]
     uidnumber = int(uidnumber_str)
@@ -119,9 +121,8 @@ for i in users_dict:
     if("krbPrincipalExpiration" not in i.keys()):
         krbPrincipalExpiration = None #''
         
-
         #i["krbPrincipalExpiration"] = [ '' ]
-        cnt_managed += 1
+        cnt_exp_managed += 1
         
         #print(i["krbPrincipalExpiration"])
         
@@ -132,8 +133,24 @@ for i in users_dict:
     else:
         krbPrincipalExpirationRaw = i["krbPrincipalExpiration"][0]
         krbPrincipalExpiration = krbPrincipalExpirationRaw[:4]+'-'+krbPrincipalExpirationRaw[4:6]+'-'+krbPrincipalExpirationRaw[6:8]
+        
         if(DEBUG_MODE):
             print("{}'s krbPrincipalExpiration: {}".format(username, i["krbPrincipalExpiration"][0]))
+
+
+    if("krbPasswordExpiration" not in i.keys()):
+        krbPasswordExpiration = None
+        cnt_psw_exp_managed += 1
+
+        if(DEBUG_MODE):
+            print("added blank krbPasswordExpiration to: {}".format(username))
+
+    else:
+        krbPasswordExpirationRaw = i["krbPasswordExpiration"][0]
+        krbPasswordExpiration = krbPasswordExpirationRaw[:4]+'-'+krbPasswordExpirationRaw[4:6]+'-'+krbPasswordExpirationRaw[6:8]
+        
+        if(DEBUG_MODE):
+            print("{}'s krbPasswordExpiration: {}".format(username, i["krbPasswordExpiration"][0]))
 
 
     if(DEBUG_MODE): #True): #DEBUG_MODE):
@@ -141,18 +158,21 @@ for i in users_dict:
         print("USER: {}".format(username))
         print("memberOf: {}".format(i["memberOf"]))
         print("krbPrincipalExpiration: {}".format(krbPrincipalExpiration))
+        print("krbPasswordExpiration: {}".format(krbPasswordExpiration))
         print("creation_date: {}".format(creation_date))
         print("group: {}, division: {}".format(group, division))
         print("memberOf: {}".format(memberOf))
         #print("---")
 
-    print("{};{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, i["mail"][0], closing_date, nsaccount_lock, password, mach)) 
+    print("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, krbPasswordExpiration, i["mail"][0], closing_date, nsaccount_lock, password, mach)) 
     cnt += 1
 
 if(DEBUG_MODE):
     print("---")
 
 sys.stderr.write("\n\nprocessed total {} elements.\n".format(cnt))
-sys.stderr.write("unmanaged {} elements.\n".format(cnt-cnt_managed))
-sys.stderr.write("managed {} elements.\n".format(cnt_managed))
+sys.stderr.write("unmanaged {} exp elements.\n".format(cnt-cnt_exp_managed))
+sys.stderr.write("managed {} exp elements.\n".format(cnt_exp_managed))
+sys.stderr.write("unmanaged {} psw_exp elements.\n".format(cnt-cnt_psw_exp_managed))
+sys.stderr.write("managed {} psw_exp elements.\n".format(cnt_psw_exp_managed))
 sys.stderr.write("m1b54 & d4n110\n\n")

@@ -4,8 +4,8 @@ DELIMITER ;;
 DROP PROCEDURE IF EXISTS update_user_ignore_division_group_name;
 CREATE PROCEDURE update_user_ignore_division_group_name
 ( 
-	 IN p_iduser_idm INT,
-	 IN p_username VARCHAR(16),
+     IN p_iduser_idm INT,
+     IN p_username VARCHAR(16),
      IN p_name VARCHAR(32),
      IN p_surname VARCHAR(32),
      IN p_uid INT,
@@ -14,6 +14,7 @@ CREATE PROCEDURE update_user_ignore_division_group_name
      IN p_creation_date DATE,
      IN p_expiration_date DATE,
      IN p_vpn_expiration_date DATE,
+     IN p_psw_expiration_date DATE,
      IN p_email VARCHAR(64),
      IN p_closing_date DATE,
      IN p_nsaccount_lock TINYINT,
@@ -26,7 +27,7 @@ CREATE PROCEDURE update_user_ignore_division_group_name
     DECLARE group_name VARCHAR(32);
 
    
-    UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, email = p_email, nsaccount_lock = p_nsaccount_lock, closing_date = p_closing_date
+    UPDATE user_idm SET username = p_username, name = p_name, surname = p_surname, uid = p_uid, gid = p_gid, creation_date = p_creation_date, expiration_date = p_expiration_date, vpn_expiration_date = p_vpn_expiration_date, psw_expiration_date = p_psw_expiration_date, email = p_email, nsaccount_lock = p_nsaccount_lock, closing_date = p_closing_date
     WHERE iduser_idm = p_iduser_idm;
 
     DELETE FROM user_group_idm WHERE iduserExt = p_iduser_idm AND type = 2;
