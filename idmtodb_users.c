@@ -1098,7 +1098,7 @@ int main(int argc, char *argv[])
 					printf("IDM: %d, DB: %d\n", pnt_user->gid, pnt_user_db->gid);
 				}
 
-				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] group_names differs\n", pnt_user->username);
@@ -1680,7 +1680,7 @@ int main(int argc, char *argv[])
                                         p_psw_expiration_date_length = 0;
                                 }
                                 
-                                if(strcmp(pnt_user->email, NULL_IDENTIFIER))
+                                if(pnt_user->email && strcmp(pnt_user->email, NULL_IDENTIFIER) && strlen(pnt_user->email))
                                 {
                                         is_null_email = 0;
                                         #ifdef DEBUG_MODE
@@ -1699,7 +1699,7 @@ int main(int argc, char *argv[])
                                         p_email_length = 0;
                                 }
                                
-                                if(strcmp(pnt_user->closing_date, NULL_IDENTIFIER))
+                                if(pnt_user->closing_date && strcmp(pnt_user->closing_date, NULL_IDENTIFIER) && strlen(pnt_user->closing_date))
                                 {
                                         
                                         is_null_closing_date = 0;
