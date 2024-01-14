@@ -1,8 +1,8 @@
 #!/bin/bash
 
 USERSIDM_SERVER=${8:-"127.0.0.1"}
-USERSIDM_USER=${9:-"sysm01"}
-USERSIDM_PASSWORD="960coreP6" #"root"
+USERSIDM_USER=${9:-"root"}
+USERSIDM_PASSWORD="root" #"root"
 USERSIDM_DATABASE="idmdb"
 
 issuer="$1"
@@ -81,6 +81,7 @@ fi
 MAIL_CMD=${8:-"/usr/sbin/sendmail"}
 #it doesn't work with the current SMTP relay
 MAIL_FROM=${9:-"hsm@cmcc.it"} #"marco_chiarelli@yahoo.it"} #"marcochiarelli.nextgenlab@gmail.com"} #"monitoring-scc@cmcc.it"}
+HSM_MAIL_CC=${10:-"hsm@cmcc.it"}
 
 mach="$7"
 
@@ -94,7 +95,8 @@ then
                 echo "Subject: Notifica attivazione account VPN CMCC";
                 echo "From: $MAIL_FROM";
                 echo "To: $email";
-                #echo "Cc: $smg_mail";
+                #echo "Cc: $smg_mail, $HSM_MAIL_CC";
+		#echo "Cc: $HSM_MAIL_CC";
                 #echo "Mime-Version: 1.0";
                 echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
                 echo "";
@@ -112,7 +114,9 @@ else
 		echo "Subject: $mach_upper account activation notification (username $username)";
        		echo "From: $MAIL_FROM";
        		echo "To: $email";
-		#echo "Cc: $division_director_mail";
+		echo "Cc: marco_chiarelli@yahoo.it";
+		#echo "Cc: $division_director_mail, $HSM_MAIL_CC";
+		#echo "Cc: $HSM_MAIL_CC";
 		echo "Mime-Version: 1.0";
        		echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
        		echo "";
