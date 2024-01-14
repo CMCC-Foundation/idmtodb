@@ -111,6 +111,7 @@ for line in $(tail "$in_file" -n+2); do
     pwd=$(echo $(export AUP_PWD_LEN=$pwd_len; python3 -c 'import os; import random; import string; print("".join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits[1:] + string.digits[1:]) for _ in range(int(os.getenv("AUP_PWD_LEN")))))'))
     
     mach=$(echo $line|cut -f10 -d"$SEP")
+    notify=$(echo $line| cut -f11 -d"$SEP")
 
     echo "USERNAME: ""$username"
     echo "FIRST: ""$first"
@@ -163,7 +164,12 @@ for line in $(tail "$in_file" -n+2); do
 	if [[ ! -z "$issuer" ]];
 	then
         	scp "$docx_filename_out" "root@sccdb.cmcc.scc":"/root/gdrive_API/files/"
-		ssh -l root "sccdb.cmcc.scc" "source /root/gdrive_API/gdrive_venv/bin/activate; cd /root/gdrive_API; mkdir -p files/$out_dir_name ; mv files/$(echo $docx_filename_out | cut -d'/' -f2) files/$docx_filename_out ; python3 upload_docx_convert_to_pdf.py files/$docx_filename_out $name_dot_surname $email $issuer >> files/$out_dir_name/drive_api_log ; cat files/$out_dir_name/drive_api_log"
+		if [[ "$notify" -eq 1 ]] || [[ ! -z "$notify" ]];
+		then
+			ssh -l root "sccdb.cmcc.scc" "source /root/gdrive_API/gdrive_venv/bin/activate; cd /root/gdrive_API; mkdir -p files/$out_dir_name ; mv files/$(echo $docx_filename_out | cut -d'/' -f2) files/$docx_filename_out ; python3 upload_docx_convert_to_pdf.py files/$docx_filename_out $name_dot_surname $email $issuer >> files/$out_dir_name/drive_api_log ; cat files/$out_dir_name/drive_api_log ; ./send_user_mail.sh $(echo ${issuer:0:1} | tr '[:lower:]' '[:upper:]')$(echo ${issuer:1:${#issuer}} | cut -d'_' -f1) $first $username $email $(echo $div | tr '[:lower:]' '[:upper:]') files/$out_dir_name/$(echo $docx_filename_out | cut -d'/' -f2 | cut -d'.' -f1).pdf $mach"
+		else
+			ssh -l root "sccdb.cmcc.scc" "source /root/gdrive_API/gdrive_venv/bin/activate; cd /root/gdrive_API; mkdir -p files/$out_dir_name ; mv files/$(echo $docx_filename_out | cut -d'/' -f2) files/$docx_filename_out ; python3 upload_docx_convert_to_pdf.py files/$docx_filename_out $name_dot_surname $email $issuer >> files/$out_dir_name/drive_api_log ; cat files/$out_dir_name/drive_api_log"
+		fi
 	fi
 
         #ipa otptoken-add --type=totp --owner=sysm07 | grep URI | sed 's/  URI: //g'
@@ -253,4 +259,4 @@ done
 #mv "$stage_file_loc_2" "$stage_file_loc"
 
 # IDMTODB Consistency
-#../idmtodb/idmtodb_launcher_users.sh "$IDMTODB_PROMPT_ON_INSERT" "$IDMTODB_PROMPT_ON_UPDATE" "$IDMTODB_PROMPT_ON_DELETE" "$IDMTODB_IGNORE_GROUPS" "$IDMTODB_IGNORE_DIVISION_GROUP_NAME" "$IDMTODB_MAX_USERS" "$stage_file_loc"
+../idmtodb/idmtodb_launcher_users.sh "$IDMTODB_PROMPT_ON_INSERT" "$IDMTODB_PROMPT_ON_UPDATE" "$IDMTODB_PROMPT_ON_DELETE" "$IDMTODB_IGNORE_GROUPS" "$IDMTODB_IGNORE_DIVISION_GROUP_NAME" "$IDMTODB_MAX_USERS" "$stage_file_loc"
