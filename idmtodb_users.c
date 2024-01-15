@@ -1125,7 +1125,7 @@ int main(int argc, char *argv[])
 					printf("IDM: %d, DB: %d\n", pnt_user->gid, pnt_user_db->gid);
 				}
 
-				if((!ignore_groups) && strcmp(pnt_user->username,"forcepoint") && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
+				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] group_names differs\n", pnt_user->username);
