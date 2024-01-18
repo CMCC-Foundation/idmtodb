@@ -210,12 +210,12 @@ static void sendmail(const char * from_mail, const char * to_mail, const char * 
 		     "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"\n"
 		     "\n"
 		     "--boundary-example\n"
-		     "Content-Type: text/html; charset=ISO-8859-15\n"
+		     "Content-Type: text/html; charset=utf-8\n" // ISO-8859-15\n"
 		     "Content-Transfer-Encoding: 7bit\n"
 		     "\n"
 		     "<html>"
 		     "<head>"
-		     "<meta http-equiv=\"content-type\" content=\"text/html; charset=ISO-8859-15\">"
+		     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">" // ISO-8859-15\">"
 		     "</head>"
 		     "<body bgcolor=\"#ffffff\" text=\"#000000\">"
 		     "<font face=\"Courier New\">%s</font><br><br><br><br><br>" 
@@ -1089,7 +1089,7 @@ int main(int argc, char *argv[])
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] closing_date, differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->closing_date, pnt_user_db->closing_date);
+					printf("Source: %s, DB: %s\n", pnt_user->closing_date, pnt_user_db->closing_date);
 				}
 
 				/*
@@ -1101,84 +1101,84 @@ int main(int argc, char *argv[])
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] name differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->name, pnt_user_db->name);
+					printf("Source: %s, DB: %s\n", pnt_user->name, pnt_user_db->name);
 				}
 
 				if(strcmp(pnt_user->surname, pnt_user_db->surname))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] surname differs\n", pnt_user->username);
-                                        printf("IDM: %s, DB: %s\n", pnt_user->surname, pnt_user_db->surname);
+                                        printf("Source: %s, DB: %s\n", pnt_user->surname, pnt_user_db->surname);
 				}
 
 				if(pnt_user->uid != pnt_user_db->uid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] uid differs\n", pnt_user->username);
-                                        printf("IDM: %d, DB: %d\n", pnt_user->uid, pnt_user_db->uid);
+                                        printf("Source: %d, DB: %d\n", pnt_user->uid, pnt_user_db->uid);
 				}
 
 				if((!ignore_groups) && pnt_user->gid != pnt_user_db->gid) // strcmp(pnt_user->group_name, pnt_user_db->group_name))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] gid differs\n", pnt_user->username);
-					printf("IDM: %d, DB: %d\n", pnt_user->gid, pnt_user_db->gid);
+					printf("Source: %d, DB: %d\n", pnt_user->gid, pnt_user_db->gid);
 				}
 
 				if((!ignore_groups) && !are_groups_same(pnt_user->group_names, pnt_user_db->group_names)) // strcmp(pnt_user->group_names, pnt_user_db->group_names))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] group_names differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->group_names, pnt_user_db->group_names);
+					printf("Source: %s, DB: %s\n", pnt_user->group_names, pnt_user_db->group_names);
 				}		
 
 				if(strcmp(pnt_user->creation_date, pnt_user_db->creation_date))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] creation_date differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->creation_date, pnt_user_db->creation_date);
+					printf("Source: %s, DB: %s\n", pnt_user->creation_date, pnt_user_db->creation_date);
 				}
 
 				if(strcmp(pnt_user->expiration_date, pnt_user_db->expiration_date))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] expiration_date differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->expiration_date, pnt_user_db->expiration_date);
+					printf("Source: %s, DB: %s\n", pnt_user->expiration_date, pnt_user_db->expiration_date);
 				}
 
 				if(strcmp(pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] vpn_expiration_date differs\n", pnt_user->username);
-					printf("IDM: %s, DB: %s\n", pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date);
+					printf("Source: %s, DB: %s\n", pnt_user->vpn_expiration_date, pnt_user_db->vpn_expiration_date);
 				}
 
 				if(strcmp(pnt_user->psw_expiration_date, pnt_user_db->psw_expiration_date))
                                 {
                                         pnt_user->iduser_idm = pnt_user_db->iduser_idm;
                                         printf("[%s] psw_expiration_date differs\n", pnt_user->username);
-                                        printf("IDM: %s, DB: %s\n", pnt_user->psw_expiration_date, pnt_user_db->psw_expiration_date);
+                                        printf("Source: %s, DB: %s\n", pnt_user->psw_expiration_date, pnt_user_db->psw_expiration_date);
                                 }
 
 				if(strcmp(pnt_user->notification_date, pnt_user_db->notification_date))
                                 {
                                         pnt_user->iduser_idm = pnt_user_db->iduser_idm;
                                         printf("[%s] notification_date differs\n", pnt_user->username);
-                                        printf("IDM: %s, DB: %s\n", pnt_user->notification_date, pnt_user_db->notification_date);
+                                        printf("Source: %s, DB: %s\n", pnt_user->notification_date, pnt_user_db->notification_date);
                                 }
 				
 				if(strcmp(pnt_user->email, pnt_user_db->email))
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] email differs\n", pnt_user->username);	
-					printf("IDM: %s, DB: %s\n", pnt_user->email, pnt_user_db->email);
+					printf("Source: %s, DB: %s\n", pnt_user->email, pnt_user_db->email);
 				}
 
 				if(pnt_user->nsaccount_lock != pnt_user_db->nsaccount_lock)
 				{
 					pnt_user->iduser_idm = pnt_user_db->iduser_idm;
 					printf("[%s] nsaccount_lock differs\n", pnt_user->username);
-					printf("IDM: %d, DB: %d\n", pnt_user->nsaccount_lock, pnt_user_db->nsaccount_lock);
+					printf("Source: %d, DB: %d\n", pnt_user->nsaccount_lock, pnt_user_db->nsaccount_lock);
 				}
 
 				//#endif
@@ -1234,7 +1234,7 @@ int main(int argc, char *argv[])
         
         // char mail_format_buf[_MAX_MAIL_LEN];
         
-        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| psw_exp_date%*.*s| notification_date%*.*s| email%*.*s| closing_date%*.*s| nsaccount_lock%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 3, 3, padding, 3, 3, padding, 10, 10, padding, 3, 3, padding, 1, 1, padding);
+        sprintf(buffer, "| username%*.*s| name%*.*s| surname%*.*s| uid%*.*s| gid%*.*s| group_names%*.*s| creation_date%*.*s| exp_date%*.*s| vpn_exp_date%*.*s| psw_exp_date%*.*s| notif_date%*.*s| email%*.*s| closing_date%*.*s| nsaccount_lock%*.*s|\n", 7, 7, padding, 11, 11, padding, 8, 8, padding, 12, 12, padding, 12, 12, padding, 4, 4, padding, 2, 2, padding, 7, 7, padding, 3, 3, padding, 3, 3, padding, 5, 5, padding, 10, 10, padding, 3, 3, padding, 1, 1, padding);
         sprintf(border_buffer, "+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+%*.*s+\n", MAX_USERNAME_LEN, MAX_USERNAME_LEN, border_padding, _MAX_NAME_LEN, _MAX_NAME_LEN, border_padding, _MAX_SURNAME_LEN, _MAX_SURNAME_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding, _MAX_GROUP_NAMES_LEN, _MAX_GROUP_NAMES_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, _MAX_EMAIL_LEN, _MAX_EMAIL_LEN, border_padding, _MAX_DATE_LEN, _MAX_DATE_LEN, border_padding, NUMBERS_FIXED_LEN, NUMBERS_FIXED_LEN, border_padding);
          
 	strcpy(mail_buffer, "");

@@ -160,12 +160,12 @@ static void sendmail(const char * from_mail, const char * to_mail, const char * 
 		     "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"\n"
 		     "\n"
 		     "--boundary-example\n"
-		     "Content-Type: text/html; charset=ISO-8859-15\n"
+		     "Content-Type: text/html; charset=utf-8\n" // ISO-8859-15\n"
 		     "Content-Transfer-Encoding: 7bit\n"
 		     "\n"
 		     "<html>"
 		     "<head>"
-		     "<meta http-equiv=\"content-type\" content=\"text/html; charset=ISO-8859-15\">"
+		     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">" // ISO-8859-15\">"
 		     "</head>"
 		     "<body bgcolor=\"#ffffff\" text=\"#000000\">"
 		     "<font face=\"Courier New\">%s</font><br><br><br><br><br>" 
@@ -631,28 +631,28 @@ int main(int argc, char *argv[])
 				{
 					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
                                         printf("[%s] desc differs\n", pnt_group->name);
-					printf("IDM: %s, DB: %s\n", pnt_group->desc, pnt_group_db->desc);
+					printf("Source: %s, DB: %s\n", pnt_group->desc, pnt_group_db->desc);
 				}
 
 				if(pnt_group->status != pnt_group_db->status)
 				{
 					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
 					printf("[%s] status differs\n", pnt_group->name);
-                                        printf("IDM: %d, DB: %d\n", pnt_group->status, pnt_group_db->status);
+                                        printf("Source: %d, DB: %d\n", pnt_group->status, pnt_group_db->status);
 				}
 
 				if(pnt_group->gid != pnt_group_db->gid)
 				{
 					pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
 					printf("[%s] gid differs\n", pnt_group->name);
-					printf("IDM: %d, DB: %d\n", pnt_group->gid, pnt_group_db->gid);
+					printf("Source: %d, DB: %d\n", pnt_group->gid, pnt_group_db->gid);
 				}
 
 				if(strcmp(pnt_group->creation_date, pnt_group_db->creation_date))
                                 {
                                         pnt_group->idgroup_idm = pnt_group_db->idgroup_idm;
                                         printf("[%s] creation_date differs\n", pnt_group->name);
-                                        printf("IDM: %s, DB: %s\n", pnt_group->creation_date, pnt_group_db->creation_date);
+                                        printf("Source: %s, DB: %s\n", pnt_group->creation_date, pnt_group_db->creation_date);
                                 }
 
                                 break; // do it in any case, if idgroup_idm field of pnt_group structure still hasn't been valued from there, however it should have the very initial value, STAY_CODE.

@@ -5,6 +5,7 @@ from user_ldap_found import users_ldap_dict
 #from user_found_preserved_json import users_dict_preserved
 #from user_ldap_preserved_found import users_ldap_preserved_dict
 from VPN_expiration_date_mod import users_vpn_dict
+from notification_date_mod import users_notif_dict
 
 DEBUG_MODE=False #True
 DIVISION_GROUP_STR="This is a division group"
@@ -16,7 +17,7 @@ cnt_psw_exp_managed=0
 divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
 jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
-print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,psw_expiration_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
+print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,psw_expiration_date,notification_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
 
 #users_dict.extend(users_dict_preserved)
 #users_ldap_dict.update(users_ldap_preserved_dict)
@@ -36,6 +37,7 @@ for i in groups_dict:
 #print(groups_desc)
 #print("---")
 
+cn_filter="cn=groups,cn=accounts,dc=idm,dc=cmcc,dc=scc" #cn=groups,cn=accounts,dc=idm,dc=cmcc,dc=scc
 groups_mapping_keys = groups_mapping.keys()
 groups_desc_keys = groups_desc.keys()
 
@@ -63,6 +65,7 @@ for i in users_dict:
     krbPrincipalExpiration = None
     krbPasswordExpiration = None
     vpn_expiration_date = None
+    notification_date = None
     uidnumber_str = i["uidnumber"][0]
     uidnumber = int(uidnumber_str)
     gidnumber_str = i["gidnumber"][0]
@@ -72,22 +75,24 @@ for i in users_dict:
 
     if(not is_preserved):
         for j in memberOf:
-            first_group_token=j.split(",")[0].split("=")
-            #this_group = None
+            if(cn_filter in j):
+                first_group_token=j.split(",")[0].split("=")
+                #this_group = None
 
-            if(first_group_token[0] != "ipaUniqueID"):
-                this_group = first_group_token[1]
-                splitted_this_group = this_group.split("-")
-                #print(this_group)
+                if(first_group_token[0] != "ipaUniqueID"):
+                    this_group = first_group_token[1]
+                    splitted_this_group = this_group.split("-")
+                    #print(this_group)
             
-                if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
-                    mach = splitted_this_group[0]
-                elif(this_group in divisions or (this_group in groups_desc_keys and DIVISION_GROUP_STR in groups_desc[this_group])):
-                    division = this_group 
-                elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
-                    group = this_group
-                else:
-                    orderedMemberOf.append(this_group)
+                    if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
+                        mach = splitted_this_group[0]
+                        orderedMemberOf.append(this_group)
+                    elif(this_group in divisions or (this_group in groups_desc_keys and DIVISION_GROUP_STR in groups_desc[this_group])):
+                        division = this_group 
+                    elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
+                        group = this_group
+                    else:
+                        orderedMemberOf.append(this_group)
 
 
         if(group == None and division != None):
@@ -117,6 +122,9 @@ for i in users_dict:
 
     if(username in users_vpn_dict.keys()):
         vpn_expiration_date = users_vpn_dict[username]
+
+    if(username in users_notif_dict.keys()):
+        notification_date = users_notif_dict[username]
 
     if("krbPrincipalExpiration" not in i.keys()):
         krbPrincipalExpiration = None #''
@@ -164,7 +172,7 @@ for i in users_dict:
         print("memberOf: {}".format(memberOf))
         #print("---")
 
-    print("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, krbPasswordExpiration, i["mail"][0], closing_date, nsaccount_lock, password, mach)) 
+    print("{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}".format(username, i["givenname"][0], i["sn"][0], uidnumber, gidnumber, ','.join(map(str,orderedMemberOf)), creation_date, krbPrincipalExpiration, vpn_expiration_date, krbPasswordExpiration, notification_date, i["mail"][0], closing_date, nsaccount_lock, password, mach)) 
     cnt += 1
 
 if(DEBUG_MODE):
