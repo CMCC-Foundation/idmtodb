@@ -3,17 +3,19 @@
 PREFIX_DEXTER="/root/gdrive_API"
 cd "$PREFIX_DEXTER"
 
-USERSIDM_SERVER=${11:-"127.0.0.1"}
-USERSIDM_USER=${12:-"root"}
-USERSIDM_PASSWORD="root"
+FIELDS=",,,,,,,,,,,,,"
+FIELDS_OUT=";;;;;;;;;;;;;"
+USERSIDM_SERVER=${12:-"127.0.0.1"}
+USERSIDM_USER=${13:-"sysm01"}
+USERSIDM_PASSWORD="960coreP6" #"root"
 USERSIDM_DATABASE="idmdb"
 
-IDMTODB_PROMPT_ON_INSERT=${5:-"1"}
-IDMTODB_PROMPT_ON_UPDATE=${6:-"1"}
-IDMTODB_PROMPT_ON_DELETE=${7:-"2"} #${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
-IDMTODB_IGNORE_GROUPS=${8:-"0"} #1"} 
-IDMTODB_IGNORE_DIVISION_GROUP_NAME=${9:-"0"}
-IDMTODB_MAX_USERS=${10:-"1000"}
+IDMTODB_PROMPT_ON_INSERT=${6:-"1"}
+IDMTODB_PROMPT_ON_UPDATE=${7:-"1"}
+IDMTODB_PROMPT_ON_DELETE=${8:-"2"} #${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
+IDMTODB_IGNORE_GROUPS=${9:-"0"} #1"} 
+IDMTODB_IGNORE_DIVISION_GROUP_NAME=${10:-"0"}
+IDMTODB_MAX_USERS=${11:-"1000"}
 
 DB_LOC="\"$USERSIDM_USER\"@\"$USERSIDM_SERVER\""
 DB_LOC_EXT="\"$USERSIDM_USER\"@\"$USERSIDM_SERVER\""".$USERSIDM_DATABASE"
@@ -23,6 +25,7 @@ AUP_HEADER="username;name;surname;uid;gid;group_names;expiration_date;vpn_expira
 DRIVE_CMCC_SCC_FOLDER_NAME="SCC-HSM/CMCC_IDM_users_credentials/00_IDM_users_list"
 DEXTER_CSV_FILENAME="dexter_users.csv"
 DEXTER_CSV_FILENAME_OUT=$(echo "$DEXTER_CSV_FILENAME" | cut -d'.' -f1)"_OUT.csv"
+DEXTER_CSV_FILENAME_OUT_TMP=$(echo "$DEXTER_CSV_FILENAME" | cut -d'.' -f1)"_OUT.csv" #_TMP.csv"
 DEXTER_CSV_FILENAME_OUT_IN_ROTATED="$(echo $DEXTER_CSV_FILENAME | cut -d '.' -f1)""_IN_""$(date '+%Y%m%d')"".csv"
 DEXTER_CSV_FILENAME_OUT_UP_ROTATED="$(echo $DEXTER_CSV_FILENAME | cut -d '.' -f1)""_UP_""$(date '+%Y%m%d')"".csv"
 MAX_USERS="$IDMTODB_MAX_USERS" #1000
@@ -32,6 +35,8 @@ MASTER_AUP_PATH="/root/add-zeus-user-group/new_script_sccdb_v2"
 GDRIVE_API_VENV="/root/gdrive_API/gdrive_venv"
 MASTER_HOST="172.16.3.11"
 TOKEN_FILE="$1"
+
+PRESERVE_WIP_CHANGES=${5:-"1"} #true
 
 MODE_IN=${2:-"1"} #true
 MODE_UP=${3:-"1"} #true
@@ -64,7 +69,7 @@ then
 		echo "Done. Pre-processing it as ""$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"".."
 		echo "$AUP_HEADER" > "$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"
 	
-		for line in $(cat "$DEXTER_CSV_FILENAME_OUT" | grep ',,,,,,,,,,,,,' -A"$MAX_USERS_IN" | tail -n+2 | tr -s ' ' '#');
+		for line in $(cat "$DEXTER_CSV_FILENAME_OUT" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2 | tr -s ' ' '#');
 		do	
 			if [[ ! -z $(echo $line | grep '"') ]];
 			then
@@ -104,7 +109,7 @@ then
 		echo "$AUP_HEADER" > "$DEXTER_CSV_FILENAME_OUT_UP_ROTATED"
 	
 
-		for line in $(cat "$DEXTER_CSV_FILENAME_OUT" | grep ',,,,,,,,,,,,,' -B"$MAX_USERS_UP" | tail -n+2 | head -n-1 | tr -s ' ' '#');
+		for line in $(cat "$DEXTER_CSV_FILENAME_OUT" | grep "$FIELDS" -B"$MAX_USERS_UP" | tail -n+2 | head -n-1 | tr -s ' ' '#');
 		do
 			if [[ ! -z $(echo $line | grep -- '"') ]];
 			then
@@ -130,9 +135,12 @@ then
 		fi
 	fi
 	
-	echo "Rotating ""$DEXTER_CSV_FILENAME_OUT"
-	mkdir -p "snapshots/drive_snapshots"
-	mv "$DEXTER_CSV_FILENAME_OUT" "snapshots/drive_snapshots/"$(echo "$DEXTER_CSV_FILENAME_OUT" | cut -d'.' -f1)"_""$(date '+%Y%m%d')"".csv"
+	if [[ "$PRESERVE_WIP_CHANGES" -ne 1 ]];
+	then
+		echo "Rotating ""$DEXTER_CSV_FILENAME_OUT"
+		mkdir -p "snapshots/drive_snapshots"
+		mv "$DEXTER_CSV_FILENAME_OUT" "snapshots/drive_snapshots/"$(echo "$DEXTER_CSV_FILENAME_OUT" | cut -d'.' -f1)"_""$(date '+%Y%m%d')"".csv"
+	fi
 else
 	echo "Invalid file." >&2
 fi
@@ -156,7 +164,32 @@ then
 
 	if [[ $(cat "$DEXTER_CSV_FILENAME" | wc -l) -gt 0 ]];
 	then
-		echo "Done. Uploading dexter_users.csv CSV file to Google Drive ""$DRIVE_CMCC_SCC_FOLDER_NAME"" CMCC-SCC shared folder.."
+		echo "Done. Uploading ""$DEXTER_CSV_FILENAME"" CSV file to Google Drive ""$DRIVE_CMCC_SCC_FOLDER_NAME"" CMCC-SCC shared folder.."
+		
+		if [[ "$PRESERVE_WIP_CHANGES" -eq 1 ]];
+		then
+			echo "Gathering WIP (work-in-progress) changes"
+			#python3 dexter.py "$DEXTER_CSV_FILENAME_OUT_TMP" "$TOKEN_FILE" #already downloaded, so commented
+			if [[ $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | wc -l) -gt 0 ]];
+			then
+				echo "$FIELDS_OUT" >> "$DEXTER_CSV_FILENAME"
+				for line in $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2);
+				do
+					this_groups=$(echo $line | cut -d'"' -f2);
+					echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f2- --output-delimiter=';')" >> "$DEXTER_CSV_FILENAME"
+				done
+				
+				#rm -f "$DEXTER_CSV_FILENAME_OUT_TMP"
+			else
+				echo "Invalid file." >&2
+			fi
+
+			echo "Rotating ""$DEXTER_CSV_FILENAME_OUT"
+                	mkdir -p "snapshots/drive_snapshots"
+                	mv "$DEXTER_CSV_FILENAME_OUT" "snapshots/drive_snapshots/"$(echo "$DEXTER_CSV_FILENAME_OUT" | cut -d'.' -f1)"_""$(date '+%Y%m%d')"".csv"
+		fi
+
+		echo "Done. Checking for correctness.."
 		python3 dexter.py "$DEXTER_CSV_FILENAME" "$TOKEN_FILE" | grep "dexter_idm_fileid" > dexter_idm_fileid.py.0
 		mv dexter_idm_fileid.py.0 dexter_idm_fileid.py
 		echo "Done. Rotating ""$DEXTER_CSV_FILENAME"".."
