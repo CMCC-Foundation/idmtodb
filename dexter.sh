@@ -6,8 +6,8 @@ cd "$PREFIX_DEXTER"
 FIELDS=",,,,,,,,,,,,,"
 FIELDS_OUT=";;;;;;;;;;;;;"
 USERSIDM_SERVER=${13:-"127.0.0.1"}
-USERSIDM_USER=${14:-"root"}
-USERSIDM_PASSWORD="root"
+USERSIDM_USER=${14:-"sysm01"}
+USERSIDM_PASSWORD="960coreP6" #"root"
 USERSIDM_DATABASE="idmdb"
 
 IDMTODB_PROMPT_ON_INSERT=${7:-"1"}
@@ -174,11 +174,11 @@ then
 			if [[ $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | wc -l) -gt 0 ]];
 			then
 				echo "$FIELDS_OUT" >> "$DEXTER_CSV_FILENAME"
-				for line in $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2);
+				for line in $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2 | tr -s ' ' '#');
 				do
 					this_groups=$(echo $line | cut -d'"' -f2);
-					echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f2- --output-delimiter=';')" >> "$DEXTER_CSV_FILENAME"
-				done
+					echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f2- --output-delimiter=';')"
+				done | tr -s '#' ' ' >> "$DEXTER_CSV_FILENAME"
 				
 				#rm -f "$DEXTER_CSV_FILENAME_OUT_TMP"
 			else
