@@ -1,0 +1,11 @@
+use idmdb;
+
+DELIMITER ;; 
+DROP PROCEDURE IF EXISTS select_all_users_3;
+CREATE PROCEDURE select_all_users_3
+( 
+) 
+   BEGIN  
+	SELECT username, name, surname, uid, gid, GROUP_CONCAT(real_group_name ORDER BY type, iduser_group_idm) AS real_group_names, IF(creation_date IS NOT NULL,creation_date,"None") AS creation_date, IF(expiration_date IS NOT NULL,expiration_date,"None") AS expiration_date, IF(vpn_expiration_date IS NOT NULL,vpn_expiration_date,"None") AS vpn_expiration_date, IF(psw_expiration_date IS NOT NULL,psw_expiration_date,"None") AS psw_expiration_date, IF(notification_date IS NOT NULL,notification_date,"None") AS notification_date, email, IF(closing_date IS NOT NULL,closing_date,"None") AS closing_date, IF(closing_date IS NULL AND nsaccount_lock = 0, "open","closed") AS status, IF(vpn_type=0, "old", "new") AS vpn_type FROM tmp_user_group GROUP BY iduser_idm, username, name, surname, uid, gid, creation_date, expiration_date, vpn_expiration_date, psw_expiration_date, notification_date, email, notes, closing_date, nsaccount_lock ORDER BY creation_date, notification_date;
+   END
+   ;;
