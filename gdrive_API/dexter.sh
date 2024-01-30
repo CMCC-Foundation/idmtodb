@@ -5,17 +5,17 @@ cd "$PREFIX_DEXTER"
 
 FIELDS=",,,,,,,,,,,,,"
 FIELDS_OUT=";;;;;;;;;;;;;"
-USERSIDM_SERVER=${12:-"127.0.0.1"}
-USERSIDM_USER=${13:-"sysm01"}
-USERSIDM_PASSWORD="960coreP6" #"root"
+USERSIDM_SERVER=${13:-"127.0.0.1"}
+USERSIDM_USER=${14:-"root"}
+USERSIDM_PASSWORD="root" #"root"
 USERSIDM_DATABASE="idmdb"
 
-IDMTODB_PROMPT_ON_INSERT=${6:-"1"}
-IDMTODB_PROMPT_ON_UPDATE=${7:-"1"}
-IDMTODB_PROMPT_ON_DELETE=${8:-"2"} #${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
-IDMTODB_IGNORE_GROUPS=${9:-"0"} #1"} 
-IDMTODB_IGNORE_DIVISION_GROUP_NAME=${10:-"0"}
-IDMTODB_MAX_USERS=${11:-"1000"}
+IDMTODB_PROMPT_ON_INSERT=${7:-"1"}
+IDMTODB_PROMPT_ON_UPDATE=${8:-"1"}
+IDMTODB_PROMPT_ON_DELETE=${9:-"2"} #${3:-"1"} # insert a number > 1 (i.e. 2) in order to permanently disable delete synchronization
+IDMTODB_IGNORE_GROUPS=${10:-"0"} #1"} 
+IDMTODB_IGNORE_DIVISION_GROUP_NAME=${11:-"0"}
+IDMTODB_MAX_USERS=${12:-"1000"}
 
 DB_LOC="\"$USERSIDM_USER\"@\"$USERSIDM_SERVER\""
 DB_LOC_EXT="\"$USERSIDM_USER\"@\"$USERSIDM_SERVER\""".$USERSIDM_DATABASE"
@@ -36,6 +36,7 @@ GDRIVE_API_VENV="/root/gdrive_API/gdrive_venv"
 MASTER_HOST="172.16.3.11"
 TOKEN_FILE="$1"
 
+REMOTE_AUP_COMMAND=${6:-"add-users-parametric-cmcc.sh"} #"add-users-parametric.sh"
 PRESERVE_WIP_CHANGES=${5:-"1"} #true
 
 MODE_IN=${2:-"1"} #true
@@ -75,11 +76,11 @@ then
 			then
 				this_groups=$(echo $line | cut -d'"' -f2 | cut -d'"' -f1);
 				mach=$(echo $this_groups | tr ',' '\n' | grep -- "-users" | cut -d'-' -f1);
-				echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f3,4,7 --output-delimiter=';')"";""$mach"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f6)" == "YES" ]]; then echo "1"; else "0"; fi)"
+				echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f3,4,7 --output-delimiter=';')"";""$mach"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f6)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f4)" == "YES" ]]; then echo "1"; else echo "0"; fi)"
 			else
 				this_group=$(echo $line | cut -d',' -f6);
 				mach=$(echo $this_groups | tr ',' '\n' | grep -- "-users" | cut -d'-' -f1);
-				echo "$(echo $line | cut -d',' -f1-6,8,9,12 --output-delimiter=';')"";""$mach"";""$(if [[ "$(echo $line | cut -d',' -f11)" == "YES" ]]; then echo "1"; else echo "0"; fi)"
+				echo "$(echo $line | cut -d',' -f1-6,8,9,12 --output-delimiter=';')"";""$mach"";""$(if [[ "$(echo $line | cut -d',' -f11)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$(if [[ "$(echo $line | cut -d',' -f9)" == "YES" ]]; then echo "1"; else echo "0"; fi)"
 			fi
 		done | tr '#' ' ' >> "$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"
 
@@ -92,7 +93,7 @@ then
 			echo "Done. Transferring ""$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"".."
 			scp "$DEXTER_CSV_FILENAME_OUT_IN_ROTATED" "root@""$MASTER_HOST":"$MASTER_AUP_PATH"
 			echo "Done. Users creation.."
-			ssh -l root "$MASTER_HOST" "cd $MASTER_AUP_PATH ; ./add-users-parametric.sh $DEXTER_CSV_FILENAME_OUT_IN_ROTATED $TOKEN_FILE"
+			ssh -l root "$MASTER_HOST" "cd $MASTER_AUP_PATH ; ./$REMOTE_AUP_COMMAND $DEXTER_CSV_FILENAME_OUT_IN_ROTATED $TOKEN_FILE"
 			echo "Done. Removing temporary file.."
 			rm -f "$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"
 		else
@@ -173,11 +174,11 @@ then
 			if [[ $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | wc -l) -gt 0 ]];
 			then
 				echo "$FIELDS_OUT" >> "$DEXTER_CSV_FILENAME"
-				for line in $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2);
+				for line in $(cat "$DEXTER_CSV_FILENAME_OUT_TMP" | grep "$FIELDS" -A"$MAX_USERS_IN" | tail -n+2 | tr -s ' ' '#');
 				do
 					this_groups=$(echo $line | cut -d'"' -f2);
-					echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f2- --output-delimiter=';')" >> "$DEXTER_CSV_FILENAME"
-				done
+					echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f2- --output-delimiter=';')"
+				done | tr -s '#' ' ' >> "$DEXTER_CSV_FILENAME"
 				
 				#rm -f "$DEXTER_CSV_FILENAME_OUT_TMP"
 			else

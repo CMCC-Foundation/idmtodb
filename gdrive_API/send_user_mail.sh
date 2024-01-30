@@ -1,8 +1,8 @@
 #!/bin/bash
 
-USERSIDM_SERVER=${12:-"127.0.0.1"}
-USERSIDM_USER=${13:-"root"}
-USERSIDM_PASSWORD="root"
+USERSIDM_SERVER=${13:-"localhost"}
+USERSIDM_USER=${14:-"root"}
+USERSIDM_PASSWORD="root" #"root"
 USERSIDM_DATABASE="idmdb"
 
 issuer="$1"
@@ -77,12 +77,13 @@ then
 fi
 
 #HSM_MAIL="hsm@cmcc.it"
-MAIL_CMD=${9:-"/usr/sbin/sendmail"}
+MAIL_CMD=${10:-"/usr/sbin/sendmail"}
 #it doesn't work with the current SMTP relay
-MAIL_FROM=${10:-"hsm@cmcc.it"} #"marco_chiarelli@yahoo.it"} #"marcochiarelli.nextgenlab@gmail.com"} #"monitoring-scc@cmcc.it"}
-HSM_MAIL_CC=${11:-"hsm@cmcc.it"}
+MAIL_FROM=${11:-"hsm@cmcc.it"} #"marco_chiarelli@yahoo.it"} #"marcochiarelli.nextgenlab@gmail.com"} #"monitoring-scc@cmcc.it"}
+HSM_MAIL_CC=${12:-"hsm@cmcc.it"}
 
 mach="$8"
+vpn_notification="$9"
 
 if [[ -z "$mach" ]];
 then
@@ -111,6 +112,30 @@ then
 		echo "Per qualsiasi problema di connettività al servizio VPN, contatta <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a><br><br>Un caro saluto,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
 	) | "$MAIL_CMD" -t "$email"
 else
+
+	if [[ "$vpn_notification" -ne 0 ]];
+	then
+		vpn_user_guides_link="https://drive.google.com/drive/folders/1JRYv7nX2fW94hVr8SWal27aGl80GPF1o"
+		(
+                echo "Subject: VPN account activation notification (CMCC)";
+                echo "From: $MAIL_FROM";
+                echo "To: $email";
+                #echo "Cc: $division_director_mail, $HSM_MAIL_CC";
+                #echo "Cc: $HSM_MAIL_CC";
+                #echo "Mime-Version: 1.0";
+                echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
+                echo "";
+                echo "--boundary-example";
+                echo "Content-Type: text/html; charset=utf-8"; #ISO-8859-15";
+                echo "Content-Transfer-Encoding: 7bit";
+                echo "";
+		echo -e "<html><body>Dear $name,<br><br>you have been issued a VPN account.<br><br>To install and configure the Forcepoint VPN client on your computer, you may follow the guide available at the following link:<br><br>";
+		echo -e "<a href=\"$vpn_user_guides_link\">$vpn_user_guides_link</a><br><br>Once you have completed the installation of the VPN client, you will be able to activate a VPN connection using <b>your personal credentials</b> that are available at the following link:<br><br>";
+		echo -e "<a href=\"""$link""\">""$link""</a><br><br>N.B. you must use your CMCC mail account in order to access this shared folder.<br><br>Contact <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a> in case you need support.<br><br>Best Regards,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
+        ) | "$MAIL_CMD" -t "$email"
+
+	fi
+
 	#mach_lower="$(echo ${mach:0:1} | tr '[:lower:]' '[:upper:]')""$(echo ${mach:1:${#mach}})"
 	mach_upper="$(echo $mach | tr '[:lower:]' '[:upper:]')"
 	mach_user_guides_link="https://drive.google.com/drive/folders/1a0MCtDAHjH7gGh9GPLuyVevD8wMLQiGg"
