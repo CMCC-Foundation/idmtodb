@@ -1,8 +1,9 @@
 #!/bin/bash
 
 CC_DIVISIONS_DIRECTORS=${13:-"0"}
-USERSIDM_SERVER=${14:-"127.0.0.1"}
-USERSIDM_USER=${15:-"root"}
+SEND_TO_REAL_EMAIL=${14:-"0"} #"1"}
+USERSIDM_SERVER=${15:-"127.0.0.1"}
+USERSIDM_USER=${16:-"root"}
 USERSIDM_PASSWORD="root"
 USERSIDM_DATABASE="idmdb"
 
@@ -77,14 +78,19 @@ then
         exit 1
 fi
 
-#HSM_MAIL="hsm@cmcc.it"
+HSM_MAIL="hsm@cmcc.it"
 MAIL_CMD=${10:-"/usr/sbin/sendmail"}
 #it doesn't work with the current SMTP relay
-MAIL_FROM=${11:-"hsm@cmcc.it"} #"marco_chiarelli@yahoo.it"} #"marcochiarelli.nextgenlab@gmail.com"} #"monitoring-scc@cmcc.it"}
-HSM_MAIL_CC=${12:-"hsm@cmcc.it"}
+MAIL_FROM=${11:-"$HSM_MAIL"} #"marco_chiarelli@yahoo.it"} #"marcochiarelli.nextgenlab@gmail.com"} #"monitoring-scc@cmcc.it"}
+HSM_MAIL_CC=${12:-"$HSM_MAIL"}
 
-mach="$8"
-vpn_notification="$9"
+mach="$9"
+vpn_notification="$8"
+
+if [[ "$SEND_TO_REAL_EMAIL" -eq 0 ]];
+then
+	email="marco_chiarelli@yahoo.it" #"$HSM_MAIL"
+fi
 
 if [[ -z "$mach" ]];
 then
@@ -100,7 +106,7 @@ then
 		then
                 	echo "Cc: $smg_mail, $HSM_MAIL_CC";
 		fi
-		#echo "Cc: $HSM_MAIL_CC";
+		echo "Cc: $HSM_MAIL_CC";
                 #echo "Mime-Version: 1.0";
                 echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
                 echo "";
@@ -128,7 +134,7 @@ else
                 then
                 	echo "Cc: $division_director_mail, $HSM_MAIL_CC";
 		fi
-                #echo "Cc: $HSM_MAIL_CC";
+                echo "Cc: $HSM_MAIL_CC";
                 #echo "Mime-Version: 1.0";
                 echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
                 echo "";
@@ -154,7 +160,7 @@ else
                 then	
 			echo "Cc: $division_director_mail, $HSM_MAIL_CC";
 		fi
-		#echo "Cc: $HSM_MAIL_CC";
+		echo "Cc: $HSM_MAIL_CC";
 		echo "Mime-Version: 1.0";
        		echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
        		echo "";
