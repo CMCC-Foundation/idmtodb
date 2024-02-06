@@ -6,8 +6,8 @@ cd "$PREFIX_DEXTER"
 FIELDS=",,,,,,,,,,,,,"
 FIELDS_OUT=";;;;;;;;;;;;;"
 USERSIDM_SERVER=${13:-"127.0.0.1"}
-USERSIDM_USER=${14:-"root"}
-USERSIDM_PASSWORD="root"
+USERSIDM_USER=${14:-"sysm01"}
+USERSIDM_PASSWORD="960coreP6" #"root"
 USERSIDM_DATABASE="idmdb"
 
 IDMTODB_PROMPT_ON_INSERT=${7:-"1"}
@@ -76,11 +76,11 @@ then
 			then
 				this_groups=$(echo $line | cut -d'"' -f2 | cut -d'"' -f1);
 				mach=$(echo $this_groups | tr ',' '\n' | grep -- "-users" | cut -d'-' -f1);
-				echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f3,7 --output-delimiter=';')"";""$mach"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f6)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f4)" == "YES" ]]; then echo "1"; else echo "0"; fi)"
+				echo "$(echo $line | cut -d',' -f1-5 --output-delimiter=';')"";""$this_groups"";""$(echo $line | cut -d'"' -f3 | cut -d',' -f3,7 --output-delimiter=';')"";""$mach"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f6)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$( if [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f4)" == "YES" ]]; then echo "1"; elif [[ "$(echo $line | cut -d'"' -f3 | cut -d',' -f4)" == "YES-OVPN" ]]; then echo "2"; else echo "0"; fi)"
 			else
 				this_group=$(echo $line | cut -d',' -f6);
 				mach=$(echo $this_groups | tr ',' '\n' | grep -- "-users" | cut -d'-' -f1);
-				echo "$(echo $line | cut -d',' -f1-6,8,12 --output-delimiter=';')"";""$mach"";""$(if [[ "$(echo $line | cut -d',' -f11)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$(if [[ "$(echo $line | cut -d',' -f9)" == "YES" ]]; then echo "1"; else echo "0"; fi)"
+				echo "$(echo $line | cut -d',' -f1-6,8,12 --output-delimiter=';')"";""$mach"";""$(if [[ "$(echo $line | cut -d',' -f11)" == "YES" ]]; then echo "1"; else echo "0"; fi)"";""$(if [[ "$(echo $line | cut -d',' -f9)" == "YES" ]]; then echo "1"; elif [[ "$(echo $line | cut -d',' -f9)" == "YES-OVPN" ]]; then echo "2"; else echo "0"; fi)"
 			fi
 		done | tr '#' ' ' >> "$DEXTER_CSV_FILENAME_OUT_IN_ROTATED"
 

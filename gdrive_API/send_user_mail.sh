@@ -3,8 +3,8 @@
 CC_DIVISIONS_DIRECTORS=${13:-"0"}
 SEND_TO_REAL_EMAIL=${14:-"0"} #"1"}
 USERSIDM_SERVER=${15:-"127.0.0.1"}
-USERSIDM_USER=${16:-"root"}
-USERSIDM_PASSWORD="root"
+USERSIDM_USER=${16:-"sysm01"}
+USERSIDM_PASSWORD="960coreP6" #"root"
 USERSIDM_DATABASE="idmdb"
 
 issuer="$1"
@@ -89,7 +89,7 @@ vpn_notification="$8"
 
 if [[ "$SEND_TO_REAL_EMAIL" -eq 0 ]];
 then
-	email="marco_chiarelli@yahoo.it" #"$HSM_MAIL"
+	email="$HSM_MAIL" #"marco_chiarelli@yahoo.it"
 fi
 
 if [[ -z "$mach" ]];
@@ -119,7 +119,7 @@ then
 		echo -e "Non è necessario installare ed attivare la connessione VPN quando lavori dalla tua postazione fissa collegata alla rete in modalità wired.<br><br>Per accedere al servizio VPN, è necessario installare sul tuo computer un client VPN (client VPN Forcepoint) e disporre delle tue credenziali personali.<br><br>";
 		echo "Per scaricare il file pdf con le tue credenziali, accedi alla seguente cartella personale (per l’accesso devi usare le credenziali mail CMCC):<br><br><a href=\"$link\">$link</a><br><br>";
 		echo "Le istruzioni per installare e configurare il client VPN sono disponibili nella cartella condivisa al seguente link:<br><br><a href=\"$vpn_user_guides_link\">$vpn_user_guides_link</a><br><br>";
-		echo "Per qualsiasi problema di connettività al servizio VPN, contatta <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a><br><br>Un caro saluto,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
+		echo "Per qualsiasi problema di connettività al servizio VPN, contatta <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a><br><br>Un caro saluto,<br>$issuer<br>HSM Team<br><br><br></body></html>";
 	) | "$MAIL_CMD" -t "$email"
 else
 
@@ -127,24 +127,36 @@ else
 	then
 		vpn_user_guides_link="https://drive.google.com/drive/folders/1JRYv7nX2fW94hVr8SWal27aGl80GPF1o"
 		(
-                echo "Subject: VPN account activation notification (CMCC)";
-                echo "From: $MAIL_FROM";
-                echo "To: $email";
-		if [[ "$CC_DIVISIONS_DIRECTORS" -ne 0 ]];
-                then
-                	echo "Cc: $division_director_mail, $HSM_MAIL_CC";
-		fi
-                echo "Cc: $HSM_MAIL_CC";
-                #echo "Mime-Version: 1.0";
-                echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
-                echo "";
-                echo "--boundary-example";
-                echo "Content-Type: text/html; charset=utf-8"; #ISO-8859-15";
-                echo "Content-Transfer-Encoding: 7bit";
-                echo "";
-		echo -e "<html><body>Dear $name,<br><br>you have been issued a VPN account.<br><br>To install and configure the Forcepoint VPN client on your computer, you may follow the guide available at the following link:<br><br>";
-		echo -e "<a href=\"$vpn_user_guides_link\">$vpn_user_guides_link</a><br><br>Once you have completed the installation of the VPN client, you will be able to activate a VPN connection using <b>your personal credentials</b> that are available at the following link:<br><br>";
-		echo -e "<a href=\"""$link""\">""$link""</a><br><br>N.B. you must use your CMCC mail account in order to access this shared folder.<br><br>Contact <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a> in case you need support.<br><br>Best Regards,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
+               		echo "Subject: New CMCC VPN service annoucement and account activation notification";
+                	echo "From: $MAIL_FROM";
+                	echo "To: $email";
+                	if [[ "$CC_DIVISIONS_DIRECTORS" -ne 0 ]];
+                	then
+                        	echo "Cc: $division_director_mail, $HSM_MAIL_CC";
+                	fi
+                	echo "Cc: $HSM_MAIL_CC";
+                	#echo "Mime-Version: 1.0";
+                	echo "Content-Type: multipart/related; boundary=\"boundary-example\"; type=\"text/html\"";
+                	echo "";
+                	echo "--boundary-example";
+                	echo "Content-Type: text/html; charset=utf-8"; #ISO-8859-15";
+                	echo "Content-Transfer-Encoding: 7bit";
+                	echo "";
+			if [[ "$vpn_notification" -ne 1 ]];
+			then
+                		echo -e "<html><body>Dear $name,<br><br>We are glad to inform you that there is a <b>new VPN service available at CMCC</b>. This service will replace the old one that will soon be discontinued.<br><br>In order to grant you access to the new VPN service, you should follow the steps below:<br><br>";
+                		echo -e "1) Install and configure the Forcepoint VPN client on your computer, you may follow the guide available at the following link:<br><br><a href=\"$vpn_user_guides_link\">$vpn_user_guides_link</a><br><br>2) Once you have completed the installation of the VPN client, you will be able to activate a VPN connection using your <b>personal credentials</b>:<br><br>";
+				echo -e "<a href=\"""$link""\">""$link""</a><br><br>";
+                		echo -e "<b>IMPORTANT:</b><br>With the new Identity Management system (IdM) running at SCC, users credentials are centrally managed. <br>IdM allows users to access many different services and hosts using the same credentials.<br>For this reason, to access the new VPN service, <b>you must provide the same credentials that you are using for your JUNO account (password+OTP)</b>.<br><br>";
+                		echo -e "N.B.<br>1) With the new VPN service, <u>you will be able to login on ZEUS but, in this case, you must use your ZEUS credentials</u> (the new IDM is not connected with ZEUS and therefore ZEUS credentials are not centrally managed).<br><br>";
+				echo -e "2) Don’t forget to close the old VPN client (OpenVPN) before using the new one.<br><br>";
+				echo -e "Contact <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a> in case you need support.<br><br>Best Regards,<br>$issuer<br>HSM Team<br><br><br></body></html>";
+			else
+				echo -e "<html><body>Dear $name,<br><br>you have been issued a VPN account.<br><br>To install and configure the Forcepoint VPN client on your computer, you may follow the guide available at the following link:<br><br>";
+				echo -e "<a href=\"$vpn_user_guides_link\">$vpn_user_guides_link</a><br><br>Once you have completed the installation of the VPN client, you will be able to activate a VPN connection using <b>your personal credentials</b> that are available at the following link:<br><br>";
+				echo -e "<a href=\"""$link""\">""$link""</a><br><br>N.B. you must use your CMCC mail account in order to access this shared folder.<br><br>Contact <a href=\"mailto:$HSM_MAIL_CC\">$HSM_MAIL_CC</a> in case you need support.<br><br>Best Regards,<br>$issuer<br>HSM Team<br><br><br></body></html>";
+			fi
+
         ) | "$MAIL_CMD" -t "$email"
 
 	fi
@@ -170,10 +182,10 @@ else
        		echo "";
 		if [[ "$is_cmcc" ]]; #[[ "$is_cmcc" ]];
 		then 
-			echo -e "<html><body>Dear $name,<br><br>you have been issued an account (username $username) in order to access the $mach_upper supercomputer.<br><br>In order to access $mach_upper, you will need to download your credentials from the following link:<br><br><a href=\"""$link""\">""$link""</a><br><br>N.B.: you must use your CMCC mail account in order to access the shared folders.<br><br>$mach_upper User Guides are available at this link:<br><br><a href=\"$mach_user_guides_link\">$mach_user_guides_link</a><br><br>Instructions for accessing $mach_upper are available in the '$mach_upper Getting Started' guide.<br><br>Best Regards,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
+			echo -e "<html><body>Dear $name,<br><br>you have been issued an account (username $username) in order to access the $mach_upper supercomputer.<br><br>In order to access $mach_upper, you will need to download your credentials from the following link:<br><br><a href=\"""$link""\">""$link""</a><br><br>N.B.: you must use your CMCC mail account in order to access the shared folders.<br><br>$mach_upper User Guides are available at this link:<br><br><a href=\"$mach_user_guides_link\">$mach_user_guides_link</a><br><br>Instructions for accessing $mach_upper are available in the '$mach_upper Getting Started' guide.<br><br>Best Regards,<br>$issuer<br>HSM Team<br><br><br></body></html>";
 		else
 			pdf_file_tag="CMCC_VPN_account_""$username""_""$(echo $division | tr '[:lower:]' '[:upper:]')"
-			echo -e "<html><body>Dear $name,<br><br>you have been issued an account (username $username) in order to access the $mach_upper supercomputer.<br><br>Your account information is available in the pdf file in attachment.<br><br>$mach_upper User Guides are available at this link:<br><br><a href=\"$mach_user_guides_link\">$mach_user_guides_link</a><br><br>Instructions for accessing $mach_upper are available in the '$mach_upper Getting Started' guide.<br><br>Best Regards,<br>$issuer<br>HSM Staff<br><br><br></body></html>";
+			echo -e "<html><body>Dear $name,<br><br>you have been issued an account (username $username) in order to access the $mach_upper supercomputer.<br><br>Your account information is available in the pdf file in attachment.<br><br>$mach_upper User Guides are available at this link:<br><br><a href=\"$mach_user_guides_link\">$mach_user_guides_link</a><br><br>Instructions for accessing $mach_upper are available in the '$mach_upper Getting Started' guide.<br><br>Best Regards,<br>$issuer<br>HSM Team<br><br><br></body></html>";
 			echo "--boundary-example";
 			echo "Content-Type: application/pdf;name=\"""$pdf_file_tag"".pdf\"";
 			echo "Content-Transfer-Encoding: BASE64";
