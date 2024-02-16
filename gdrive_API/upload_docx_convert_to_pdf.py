@@ -43,7 +43,7 @@ if __name__ == "__main__":
         upload_to_folder(service, folder_id=folder_id, file_name=out_file_name, out_file_name=out_file_name.split("/")[-1], mimeTypeIn="application/pdf", mimeTypeOut="application/pdf")
         
         mail_domain=real_email.split("@")[1].split(".")[0]
-        if(real_email and (mail_domain == "cmcc" or mail_domain == "gmail")):
+        if(real_email and (mail_domain == "cmcc" or mail_domain == "gmail" or mail_domain == "eiee")):
             user_permission = {
                 "type": "user",
                 "role": "reader",
