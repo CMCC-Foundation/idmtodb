@@ -124,11 +124,11 @@ enum
 #define MAX_SURNAME_LEN 32
 #define MAX_GROUP_NAME_LEN 32
 #define MAX_DIVISION_LEN 32
-#define MAX_GROUP_NAMES_LEN 320 // 32*10 (on average user belonging to 10+ IDM groups)
+#define MAX_GROUP_NAMES_LEN 1024 // 320 // 32*10 (on average user belonging to 10+ IDM groups)
 #define MAX_DATE_LEN 100
 #define MAX_EMAIL_LEN 64
 
-#define MAX_GROUPS 10 // according to the previous comment on MAX_GROUP_NAMES_LEN
+#define MAX_GROUPS 40 // 10 // according to the previous comment on MAX_GROUP_NAMES_LEN
 
 #define _MAX_NAME_LEN 16
 #define _MAX_SURNAME_LEN 16
