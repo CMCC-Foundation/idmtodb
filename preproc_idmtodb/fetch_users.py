@@ -14,7 +14,7 @@ DIVISION_GROUP_STR="This is a division group"
 cnt=0
 cnt_exp_managed=0
 cnt_psw_exp_managed=0
-divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
+divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd", "esyda", "goco", "rofs"] #, "cmcc", "scc", "ext"]
 jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
 print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,psw_expiration_date,notification_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
