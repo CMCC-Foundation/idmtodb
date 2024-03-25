@@ -14,7 +14,7 @@ DIVISION_GROUP_STR="This is a division group"
 cnt=0
 cnt_exp_managed=0
 cnt_psw_exp_managed=0
-divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd"] #, "cmcc", "scc", "ext"]
+divisions=["asc", "opa", "csp", "ecip", "remhi", "sysm", "oda", "seme", "iafes", "raas", "iscd", "esyda", "goco", "rofs", "clivap"] #, "cmcc", "scc", "ext"]
 jolly_groups=[] #"ipausers", "juno-users", "juno-cmcc", "juno-ext"]
 
 print("username,name,surname,uid,gid,group_names,creation_date,expiration_date,vpn_expiration_date,psw_expiration_date,notification_date,email,closing_date,nsaccount_lock,password,mach") #,no_cmcc,closing_date,status")I
@@ -37,6 +37,7 @@ for i in groups_dict:
 #print(groups_desc)
 #print("---")
 
+cn_filter="cn=groups,cn=accounts,dc=idm,dc=cmcc,dc=scc" #cn=groups,cn=accounts,dc=idm,dc=cmcc,dc=scc
 groups_mapping_keys = groups_mapping.keys()
 groups_desc_keys = groups_desc.keys()
 
@@ -74,22 +75,24 @@ for i in users_dict:
 
     if(not is_preserved):
         for j in memberOf:
-            first_group_token=j.split(",")[0].split("=")
-            #this_group = None
+            if(cn_filter in j):
+                first_group_token=j.split(",")[0].split("=")
+                #this_group = None
 
-            if(first_group_token[0] != "ipaUniqueID"):
-                this_group = first_group_token[1]
-                splitted_this_group = this_group.split("-")
-                #print(this_group)
+                if(first_group_token[0] != "ipaUniqueID"):
+                    this_group = first_group_token[1]
+                    splitted_this_group = this_group.split("-")
+                    #print(this_group)
             
-                if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
-                    mach = splitted_this_group[0]
-                elif(this_group in divisions or (this_group in groups_desc_keys and DIVISION_GROUP_STR in groups_desc[this_group])):
-                    division = this_group 
-                elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
-                    group = this_group
-                else:
-                    orderedMemberOf.append(this_group)
+                    if(len(splitted_this_group) > 1 and splitted_this_group[1] == "users"):
+                        mach = splitted_this_group[0]
+                        orderedMemberOf.append(this_group)
+                    elif(this_group in divisions or (this_group in groups_desc_keys and DIVISION_GROUP_STR in groups_desc[this_group])):
+                        division = this_group 
+                    elif(this_group not in jolly_groups and gidnumber_str in groups_mapping_keys and this_group == groups_mapping[gidnumber_str] ):
+                        group = this_group
+                    else:
+                        orderedMemberOf.append(this_group)
 
 
         if(group == None and division != None):
